@@ -1,458 +1,277 @@
-<!DOCTYPE html>
-<html lang="ru" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEKKEL JEWELLERY — Эксклюзивные Бриллиантовые Украшения</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Google Fonts & FontAwesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #12072B 0%, #2A115C 50%, #12072B 100%);
-        }
-        .serif-font {
-            font-family: 'Cinzel', serif;
-        }
-        /* Эффект стеклянного размытия (Glassmorphism) */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        /* 3D эффект для карточек */
-        .tilt-card {
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        /* Модальное окно зума */
-        .zoom-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(18, 7, 43, 0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .zoomed-img {
-            max-width: 90%;
-            max-height: 85vh;
-            transform: scale(1);
-            transition: transform 0.3s ease;
-            cursor: zoom-in;
-        }
-        .zoomed-img.magnified {
-            transform: scale(2);
-            cursor: zoom-out;
-        }
-    </style>
-</head>
-<body class="text-white min-h-screen antialiased selection:bg-[#9D4EDD] selection:text-white">
+import React, { useState } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Stage, MeshReflectorMaterial } from '@react-three/drei';
+import { MotionAnimate } from 'react-motion-animate'; // Для плавных 3D-переходов при скролле
+import { FaInstagram, FaWhatsapp, FaShoppingBag, FaSearchPlus } from 'react-icons/fa';
 
-    <!-- НАВИГАЦИЯ -->
-    <header class="sticky top-0 z-50 glass-card border-b border-white/10 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="serif-font text-2xl font-bold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-[#E0AAFF] to-white">
-                GEKKEL
+// --- Имитация 3D Модели Кольца (Базовый Меш для демонстрации 3D движения) ---
+function DiamondRingModel() {
+  return (
+    <mesh castShadow receiveShadow position={[0, -0.5, 0]} rotation={[0, Math.PI / 4, 0]}>
+      <torusGeometry args={[1, 0.15, 16, 100]} />
+      <meshStandardMaterial color="#E5E7EB" roughness={0.1} metalness={1} />
+      <mesh position={[0, 1.1, 0]}>
+        <octahedronGeometry args={[0.25]} />
+        <meshStandardMaterial color="#00F2FE" roughness={0} metalness={0.9} emissive="#00F2FE" emissiveIntensity={0.2} />
+      </mesh>
+    </mesh>
+  );
+}
+
+// --- ДЕМО-ДАННЫЕ КАТАЛОГА (Сгенерировано 6 позиций для примера, легко расширяется до 50) ---
+const INITIAL_PRODUCTS = [
+  { id: 1, type: 'ring', name: 'Кольцо Eternity Classic', price: 450000, carat: 0.5, size: 16.5, shape: 'Круг', color: 'D (Бесцветный)', origin: 'Природный', status: 'В наличии', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80' },
+  { id: 2, type: 'ring', name: 'Кольцо Royal Emerald Cut', price: 1200000, carat: 1.5, size: 17.0, shape: 'Изумруд', color: 'E (Исключительный)', origin: 'Лабораторный', status: 'На заказ (7-14 дней)', img: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=600&q=80' },
+  { id: 3, type: 'pendant', name: 'Подвеска Halo Diamond', price: 380000, carat: 0.4, size: 'Универсальный', shape: 'Круг', color: 'F (Редкий)', origin: 'Природный', status: 'В наличии', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80' },
+  { id: 4, type: 'ring', name: 'Кольцо Solitaire Princess', price: 670000, carat: 0.8, size: 16.0, shape: 'Принцесса', color: 'D (Бесцветный)', origin: 'Лабораторный', status: 'В наличии', img: 'https://images.unsplash.com/photo-1543294001-f7cbfe92237e?auto=format&fit=crop&w=600&q=80' },
+  { id: 5, type: 'pendant', name: 'Колье Diamond Drop', price: 950000, carat: 1.2, size: 'Универсальный', shape: 'Капля', color: 'E (Исключительный)', origin: 'Природный', status: 'На заказ (10 дней)', img: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=80' },
+];
+
+export default function App() {
+  // Состояния для фильтров
+  const [filterType, setFilterType] = useState('all');
+  const [maxPrice, setMaxPrice] = useState(1500000);
+  const [carat, setCarat] = useState('all');
+  const [origin, setOrigin] = useState('all');
+  
+  // Состояние зума для фото
+  const [zoomedImg, setZoomedImg] = useState(null);
+
+  // Фильтрация товаров
+  const filteredProducts = INITIAL_PRODUCTS.filter(product => {
+    if (filterType !== 'all' && product.type !== filterType) return false;
+    if (product.price > maxPrice) return false;
+    if (origin !== 'all' && product.origin !== origin) return false;
+    if (carat !== 'all') {
+      if (carat === 'low' && product.carat >= 0.6) return false;
+      if (carat === 'high' && product.carat < 0.6) return false;
+    }
+    return true;
+  });
+
+  return (
+    <div className="bg-[#0B0C10] text-white min-h-screen font-sans selection:bg-[#00F2FE] selection:text-black">
+      
+      {/* --- НАВИГАЦИЯ / ШАПКА --- */}
+      <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[#0B0C10]/70 border-b border-gray-800 transition-all">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="text-2xl font-bold tracking-widest text-[#00F2FE]">GEKKEL JEWELLERY</div>
+          <nav className="hidden md:flex space-x-8 text-sm tracking-widest uppercase">
+            <a href="#catalog" className="hover:text-[#00F2FE] transition">Каталог</a>
+            <a href="#edu" className="hover:text-[#00F2FE] transition">Гид по бриллиантам</a>
+            <a href="#contacts" className="hover:text-[#00F2FE] transition">Контакты</a>
+          </nav>
+          <div className="flex space-x-4 items-center">
+            <a href="https://www.instagram.com/gekkel_diamond/" target="_blank" rel="noreferrer" className="text-xl hover:text-[#00F2FE] transition"><FaInstagram /></a>
+            <a href="https://wa.me/77019475000" target="_blank" rel="noreferrer" className="text-xl hover:text-[#00F2FE] transition"><FaWhatsapp /></a>
+          </div>
+        </div>
+      </header>
+
+      {/* --- ГЛАВНЫЙ ЭКРАН (3D ИНТЕРАКТИВ) --- */}
+      <section className="h-screen flex flex-col md:flex-row items-center justify-between pt-20 px-6 max-w-7xl mx-auto relative">
+        <div className="md:w-1/2 z-10 space-y-6 mt-12 md:mt-0">
+          <span className="text-[#00F2FE] text-xs uppercase tracking-widest font-semibold px-3 py-1 bg-[#00F2FE]/10 rounded-full border border-[#00F2FE]/20">Premium & Custom</span>
+          <h1 className="text-5xl md:text-7xl font-light tracking-tight leading-none">Совершенство в <br/><span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white via-[#00F2FE] to-white">каждой грани</span></h1>
+          <p className="text-gray-400 text-lg max-w-md font-light">Природные и лабораторные бриллианты топ-характеристик с международными сертификатами GIA и IGI. Создание шедевров на заказ.</p>
+          <div className="flex space-x-4 pt-4">
+            <a href="#catalog" className="bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-black font-semibold px-8 py-4 rounded-none hover:shadow-[0_0_30px_rgba(0,242,254,0.5)] transition tracking-wider uppercase text-xs">Смотреть каталог</a>
+            <a href="https://wa.me/77019475000" className="border border-white/20 hover:border-[#00F2FE] px-8 py-4 text-xs uppercase tracking-wider transition">Консультация</a>
+          </div>
+        </div>
+
+        {/* 3D Сцена с кольцом */}
+        <div className="w-full md:w-1/2 h-[50vh] md:h-[80vh] cursor-grab active:cursor-grabbing">
+          <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
+            <ambientLight intensity={0.5} />
+            <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+            <pointLight position={[-10, -10, -10]} />
+            <Stage environment="city" intensity={0.6}>
+              <DiamondRingModel />
+            </Stage>
+            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
+          </Canvas>
+          <div className="text-center text-xs text-gray-500 uppercase tracking-widest -mt-10">Взаимодействуйте: вращайте 3D модель</div>
+        </div>
+      </section>
+
+      {/* --- БЛОК ПРЕИМУЩЕСТВ --- */}
+      <section className="py-20 border-t border-b border-gray-900 bg-black/40">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div>
+            <div className="text-[#00F2FE] text-3xl font-light mb-2">GIA / IGI</div>
+            <p className="text-xs uppercase tracking-wider text-gray-400">100% Сертификация</p>
+          </div>
+          <div>
+            <div className="text-[#00F2FE] text-3xl font-light mb-2">Топ 4C</div>
+            <p className="text-xs uppercase tracking-wider text-gray-400">Высшие характеристики</p>
+          </div>
+          <div>
+            <div className="text-[#00F2FE] text-3xl font-light mb-2">Лаб & Натур</div>
+            <p className="text-xs uppercase tracking-wider text-gray-400">Любые виды бриллиантов</p>
+          </div>
+          <div>
+            <div className="text-[#00F2FE] text-3xl font-light mb-2">Индивидуально</div>
+            <p className="text-xs uppercase tracking-wider text-gray-400">Изготовление на заказ</p>
+          </div>
+        </div>
+      </section>
+
+      {/* --- КАТАЛОГ С ИНТЕЛЛЕКТУАЛЬНЫМ ФИЛЬТРОМ --- */}
+      <section id="catalog" className="py-24 max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+          <div>
+            <h2 className="text-3xl font-light tracking-widest uppercase">Экспозиция изделий</h2>
+            <p className="text-gray-500 mt-2">Минималистичные кадры, точные характеристики.</p>
+          </div>
+          {/* Тип украшения */}
+          <div className="flex space-x-4 mt-6 md:mt-0 overflow-x-auto pb-2">
+            {['all', 'ring', 'pendant'].map((t) => (
+              <button key={t} onClick={() => setFilterType(t)} className={`px-6 py-2 text-xs uppercase tracking-widest border transition ${filterType === t ? 'border-[#00F2FE] text-[#00F2FE] bg-[#00F2FE]/5' : 'border-gray-800 text-gray-400'}`}>
+                {t === 'all' ? 'Все' : t === 'ring' ? 'Кольца' : 'Подвески'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ПАНЕЛЬ ФИЛЬТРОВ */}
+        <div className="bg-[#12141C] p-6 rounded-none mb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 border border-gray-900">
+          <div>
+            <label className="block text-xs uppercase text-gray-400 tracking-wider mb-2">Бюджет (до: {maxPrice.toLocaleString()} ₸)</label>
+            <input type="range" min="300000" max="1500000" step="50000" value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-full accent-[#00F2FE]" />
+          </div>
+          <div>
+            <label className="block text-xs uppercase text-gray-400 tracking-wider mb-2">Происхождение</label>
+            <select value={origin} onChange={(e) => setOrigin(e.target.value)} className="w-full bg-black border border-gray-800 p-2 text-xs text-gray-300 focus:border-[#00F2FE] outline-none">
+              <option value="all">Все бриллианты</option>
+              <option value="Природный">Природные</option>
+              <option value="Лабораторный">Лабораторные (HPHT/CVD)</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs uppercase text-gray-400 tracking-wider mb-2">Каратность (Ct)</label>
+            <select value={carat} onChange={(e) => setCarat(e.target.value)} className="w-full bg-black border border-gray-800 p-2 text-xs text-gray-300 focus:border-[#00F2FE] outline-none">
+              <option value="all">Любой вес</option>
+              <option value="low">До 0.6 Ct</option>
+              <option value="high">От 0.6 Ct и выше</option>
+            </select>
+          </div>
+          <div className="flex items-end text-xs text-gray-500">
+            Найдено позиций: {filteredProducts.length} из 50
+          </div>
+        </div>
+
+        {/* СЕТКА С ТОВАРАМИ (По 1 штуке в минималистичном стиле) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredProducts.map((product) => (
+            <div key={product.id} className="group bg-black/40 border border-gray-900 overflow-hidden hover:border-[#00F2FE]/40 transition duration-500 relative flex flex-col justify-between">
+              
+              {/* Изображение с функцией Zoom */}
+              <div className="relative overflow-hidden bg-gray-950 aspect-square">
+                <img src={product.img} alt={product.name} className="object-cover w-full h-full transform group-hover:scale-105 transition duration-700 opacity-90 group-hover:opacity-100" />
+                <span className={`absolute top-4 left-4 text-[10px] uppercase tracking-widest px-2 py-1 text-black font-semibold ${product.status === 'В наличии' ? 'bg-[#00F2FE]' : 'bg-amber-400'}`}>
+                  {product.status}
+                </span>
+                {/* Иконка Приближения */}
+                <button onClick={() => setZoomedImg(product.img)} className="absolute bottom-4 right-4 bg-black/60 p-3 text-white hover:text-[#00F2FE] backdrop-blur-sm opacity-0 group-hover:opacity-100 transition duration-300">
+                  <FaSearchPlus />
+                </button>
+              </div>
+
+              {/* Данные товара */}
+              <div className="p-6 space-y-4 flex-grow flex flex-col justify-between">
+                <div>
+                  <h3 className="font-medium text-lg tracking-wide group-hover:text-[#00F2FE] transition">{product.name}</h3>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 mt-3 pt-3 border-t border-gray-900">
+                    <div>Вес: <span className="text-white">{product.carat} Ct</span></div>
+                    <div>Форма: <span className="text-white">{product.shape}</span></div>
+                    <div>Цвет: <span className="text-white">{product.color}</span></div>
+                    <div>Тип: <span className="text-white">{product.origin}</span></div>
+                    {product.type === 'ring' && <div>Размер: <span className="text-white">{product.size}</span></div>}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-900">
+                  <div className="text-xl font-semibold tracking-wider text-[#00F2FE] mb-4">{product.price.toLocaleString()} ₸</div>
+                  
+                  {/* Способы оплаты и корзина */}
+                  <div className="space-y-2">
+                    <button className="w-full bg-white text-black hover:bg-[#00F2FE] hover:text-black font-medium py-3 text-xs uppercase tracking-widest transition flex items-center justify-center space-x-2">
+                      <FaShoppingBag /> <span>В корзину</span>
+                    </button>
+                    <div className="grid grid-cols-2 gap-2 text-[10px] text-center uppercase tracking-wider">
+                      <div className="border border-gray-800 py-2 text-gray-400">Картой Online</div>
+                      <div className="border border-[#00F2FE]/30 py-2 text-[#00F2FE] bg-[#00F2FE]/5">В Рассрочку 0%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* --- ИНФОРМАЦИОННЫЙ БЛОК / ЛАЙФХАКИ --- */}
+      <section id="edu" className="py-24 border-t border-gray-900 bg-[#0E1017]">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-3xl font-light tracking-widest text-center uppercase mb-16">Экспертный гид GEKKEL</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            {/* Лайфхак 1 */}
+            <div className="border-l-2 border-[#00F2FE] pl-6 space-y-3">
+              <h3 className="text-xl font-medium">Природные vs Лабораторные бриллианты</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                С химической, физической и оптической точек зрения они абсолютно идентичны (оба состоят из чистого углерода и имеют твердость 10 по Моосу). Разница лишь в происхождении. Природные создавались миллионы лет в недрах земли, а лабораторные выращиваются в современных лабораториях по технологиям HPHT/CVD. Лабораторные позволяют получить чистейшие характеристики **на 50-70% доступнее**.
+              </p>
+            </div>
+            
+            {/* Лайфхак 2 */}
+            <div className="border-l-2 border-[#00F2FE] pl-6 space-y-3">
+              <h3 className="text-xl font-medium">Как выбрать идеальное кольцо для помолвки?</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Ориентируйтесь на правило **4C**: Carat (Вес), Cut (Огранка), Color (Цвет), Clarity (Чистота). Если важен визуальный размер — выбирайте форму «Маркиз» или «Овал», они кажутся крупнее круглых при одинаковом весе. И всегда требуйте сертификаты **GIA** или **IGI** — это гарантия подлинности ваших инвестиций.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- МОДАЛЬНОЕ ОКНО ПРИБЛИЖЕНИЯ ФОТО (ZOOM) --- */}
+      {zoomedImg && (
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md" onClick={() => setZoomedImg(null)}>
+          <div className="relative max-w-4xl max-h-[90vh] overflow-hidden">
+            <img src={zoomedImg} alt="Zoomed view" className="object-contain max-w-full max-h-[85vh] scale-125 cursor-zoom-out transition duration-300" />
+            <div className="text-center text-xs text-gray-400 mt-4 tracking-widest">Кликните в любом месте, чтобы закрыть</div>
+          </div>
+        </div>
+      )}
+
+      {/* --- ПОДВАЛ / КОНТАКТЫ --- */}
+      <footer id="contacts" className="bg-black py-16 border-t border-gray-900 text-gray-500 text-sm">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="space-y-4">
+            <div className="text-white text-xl font-bold tracking-widest">GEKKEL JEWELLERY</div>
+            <p className="text-xs max-w-xs leading-relaxed">Эксклюзивные ювелирные изделия с сертифицированными бриллиантами высшей пробы.</p>
+          </div>
+          <div className="space-y-2">
+            <div className="text-white text-xs uppercase tracking-widest font-semibold mb-4">Связь и заказ</div>
+            <a href="tel:+77019475000" className="block hover:text-white transition text-lg text-gray-300">+7 701 947 5000</a>
+            <a href="https://wa.me/77019475000" className="flex items-center space-x-2 text-[#00F2FE] hover:underline pt-2">
+              <FaWhatsapp /> <span>Написать в WhatsApp</span>
             </a>
-            
-            <nav class="hidden md:flex space-x-8 text-sm uppercase tracking-widest font-medium">
-                <a href="#catalog" class="hover:text-[#E0AAFF] transition">Каталог</a>
-                <a href="#features" class="hover:text-[#E0AAFF] transition">Преимущества</a>
-                <a href="#education" class="hover:text-[#E0AAFF] transition">Гид по бриллиантам</a>
-                <a href="#contacts" class="hover:text-[#E0AAFF] transition">Контакты</a>
-            </nav>
-
-            <div class="flex items-center space-x-4">
-                <a href="https://www.instagram.com/gekkel_diamond/" target="_blank" class="text-xl hover:text-[#E0AAFF] transition"><i class="fab fa-instagram"></i></a>
-                <a href="https://wa.me/77019475000" target="_blank" class="text-xl hover:text-[#E0AAFF] transition"><i class="fab fa-whatsapp"></i></a>
-                <!-- Корзина -->
-                <button onclick="toggleCartModal()" class="relative p-2 hover:text-[#E0AAFF] transition cursor-pointer">
-                    <i class="fas fa-shopping-bag text-xl"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-[#9D4EDD] text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
-                </button>
-            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-white text-xs uppercase tracking-widest font-semibold mb-4">Социальные сети</div>
+            <a href="https://www.instagram.com/gekkel_diamond/" target="_blank" rel="noreferrer" className="flex items-center space-x-2 hover:text-white transition">
+              <FaInstagram /> <span>@gekkel_diamond</span>
+            </a>
+          </div>
         </div>
-    </header>
-
-    <!-- ГЛАВНЫЙ ЭКРАН (HERO SECTION) -->
-    <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden px-4">
-        <!-- Декоративные 3D светящиеся сферы на фоне -->
-        <div class="absolute top-1/4 left-10 w-72 h-72 bg-[#7B2CBF]/20 rounded-full blur-[120px] animate-pulse"></div>
-        <div class="absolute bottom-1/4 right-10 w-96 h-96 bg-[#3C096C]/40 rounded-full blur-[150px]"></div>
-
-        <div class="max-w-5xl mx-auto text-center z-10 space-y-6">
-            <span class="text-xs uppercase tracking-[0.4em] text-[#E0AAFF] font-semibold block">Природные и лабораторные бриллианты</span>
-            <h1 class="serif-font text-4xl sm:text-6xl lg:text-7xl font-bold tracking-wide leading-tight">
-                Магия совершенства <br>в каждой грани
-            </h1>
-            <p class="max-w-2xl mx-auto text-sm sm:text-base text-gray-300 font-light tracking-wide">
-                Топ характеристики, международные сертификаты GIA и IGI. Создаем шедевры ювелирного искусства в наличии и под индивидуальный заказ.
-            </p>
-            <div class="pt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="#catalog" class="px-8 py-4 bg-gradient-to-r from-[#9D4EDD] to-[#7B2CBF] hover:from-[#7B2CBF] hover:to-[#5A189A] text-sm uppercase tracking-widest font-semibold rounded-full shadow-lg shadow-[#7B2CBF]/30 transition transform hover:-translate-y-1 w-full sm:w-auto">
-                    Смотреть каталог
-                </a>
-                <a href="https://wa.me/77019475000" target="_blank" class="px-8 py-4 border border-white/20 hover:border-white/60 text-sm uppercase tracking-widest font-semibold rounded-full transition glass-card w-full sm:w-auto text-center">
-                    Консультация ювелира
-                </a>
-            </div>
+        <div className="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-gray-950 text-center text-xs">
+          &copy; {new Date().getFullYear()} GEKKEL JEWELLERY. Все права защищены.
         </div>
-    </section>
+      </footer>
 
-    <!-- ПРЕИМУЩЕСТВА (БАННЕРЫ ИНФО) -->
-    <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div class="glass-card p-6 rounded-2xl text-center border-white/5">
-            <i class="fas fa-gem text-2xl text-[#E0AAFF] mb-3"></i>
-            <h3 class="text-xs sm:text-sm uppercase tracking-wider font-semibold">Любые бриллианты</h3>
-            <p class="text-xs text-gray-400 mt-1">Природные и лабораторные (Lab-Grown)</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl text-center border-white/5">
-            <i class="fas fa-star text-2xl text-[#E0AAFF] mb-3"></i>
-            <h3 class="text-xs sm:text-sm uppercase tracking-wider font-semibold">Топ характеристики</h3>
-            <p class="text-xs text-gray-400 mt-1">Идеальная огранка, цвет и чистота</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl text-center border-white/5">
-            <i class="fas fa-certificate text-2xl text-[#E0AAFF] mb-3"></i>
-            <h3 class="text-xs sm:text-sm uppercase tracking-wider font-semibold">Сертификация</h3>
-            <p class="text-xs text-gray-400 mt-1">Строгие стандарты GIA и IGI</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl text-center border-white/5">
-            <i class="fas fa-pencil-ruler text-2xl text-[#E0AAFF] mb-3"></i>
-            <h3 class="text-xs sm:text-sm uppercase tracking-wider font-semibold">На заказ</h3>
-            <p class="text-xs text-gray-400 mt-1">Реализуем эскиз любой сложности</p>
-        </div>
-    </section>
-
-    <!-- ИНТЕРАКТИВНЫЙ КАТАЛОГ -->
-    <section id="catalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center mb-12">
-            <h2 class="serif-font text-3xl sm:text-4xl font-bold tracking-widest">Коллекции GEKKEL</h2>
-            <p class="text-xs sm:text-sm text-[#E0AAFF] tracking-widest uppercase mt-2">Эксклюзивный выбор прямо сейчас</p>
-        </div>
-
-        <!-- Сетка товаров -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            <!-- Карточка 1: Кольцо -->
-            <div class="tilt-card glass-card rounded-2xl overflow-hidden group flex flex-col justify-between" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
-                <div class="relative overflow-hidden bg-black/20 aspect-square flex items-center justify-center">
-                    <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80" alt="Кольцо Royal Promise" class="w-full h-full object-cover transition duration-500 group-hover:scale-105 cursor-zoom-in" onclick="openZoom(this.src)">
-                    <span class="absolute top-4 left-4 bg-[#9D4EDD] text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full">В наличии</span>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs text-gray-400 uppercase tracking-widest">Кольца</span>
-                            <h3 class="serif-font text-lg font-semibold mt-1">Royal Promise White</h3>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-lg font-bold block text-[#E0AAFF]">850 000 ₸</span>
-                            <span class="text-[10px] text-gray-400 block">Рассрочка от 70 833 ₸/мес</span>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-300 font-light line-clamp-2">Белое золото 585 пробы, центральный природный бриллиант 0.7 карата, GIA сертификат.</p>
-                    <button onclick="addToCart('Кольцо Royal Promise White', 850000)" class="w-full py-3 bg-white/10 hover:bg-[#9D4EDD] rounded-xl text-xs uppercase tracking-widest font-semibold transition cursor-pointer">
-                        В корзину
-                    </button>
-                </div>
-            </div>
-
-            <!-- Карточка 2: Подвеска -->
-            <div class="tilt-card glass-card rounded-2xl overflow-hidden group flex flex-col justify-between" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
-                <div class="relative overflow-hidden bg-black/20 aspect-square flex items-center justify-center">
-                    <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80" alt="Подвеска Aura" class="w-full h-full object-cover transition duration-500 group-hover:scale-105 cursor-zoom-in" onclick="openZoom(this.src)">
-                    <span class="absolute top-4 left-4 bg-amber-600 text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full">На заказ (10-14 дней)</span>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs text-gray-400 uppercase tracking-widest">Подвески</span>
-                            <h3 class="serif-font text-lg font-semibold mt-1">Aura Diamond Drop</h3>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-lg font-bold block text-[#E0AAFF]">540 000 ₸</span>
-                            <span class="text-[10px] text-gray-400 block">Рассрочка от 45 000 ₸/мес</span>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-300 font-light line-clamp-2">Желтое золото 750 пробы, лабораторный бриллиант каплевидной огранки 0.5 карата, IGI сертификат.</p>
-                    <button onclick="addToCart('Подвеска Aura Diamond Drop', 540000)" class="w-full py-3 bg-white/10 hover:bg-[#9D4EDD] rounded-xl text-xs uppercase tracking-widest font-semibold transition cursor-pointer">
-                        В корзину
-                    </button>
-                </div>
-            </div>
-
-            <!-- Карточка 3: Кольцо на заказ -->
-            <div class="tilt-card glass-card rounded-2xl overflow-hidden group flex flex-col justify-between" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
-                <div class="relative overflow-hidden bg-black/20 aspect-square flex items-center justify-center">
-                    <img src="https://images.unsplash.com/photo-1543294001-f7cbfe92237e?auto=format&fit=crop&w=600&q=80" alt="Кольцо Eternity Spark" class="w-full h-full object-cover transition duration-500 group-hover:scale-105 cursor-zoom-in" onclick="openZoom(this.src)">
-                    <span class="absolute top-4 left-4 bg-[#9D4EDD] text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full">В наличии</span>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs text-gray-400 uppercase tracking-widest">Кольца</span>
-                            <h3 class="serif-font text-lg font-semibold mt-1">Eternity Spark Ring</h3>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-lg font-bold block text-[#E0AAFF]">1 200 000 ₸</span>
-                            <span class="text-[10px] text-gray-400 block">Рассрочка от 100 000 ₸/мес</span>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-300 font-light line-clamp-2">Платина, дорожка из 7 идеальных круглых природных бриллиантов, общий вес 1.2 карата.</p>
-                    <button onclick="addToCart('Eternity Spark Ring', 1200000)" class="w-full py-3 bg-white/10 hover:bg-[#9D4EDD] rounded-xl text-xs uppercase tracking-widest font-semibold transition cursor-pointer">
-                        В корзину
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ЭДУКАЦИОННЫЙ БЛОК: ИНФОРМАЦИЯ И ЛАЙФХАКИ -->
-    <section id="education" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="text-center mb-10">
-            <h2 class="serif-font text-2xl sm:text-3xl font-bold tracking-widest">Гид по выбору украшений</h2>
-            <p class="text-xs text-gray-400 mt-2">Всё, что нужно знать о совершенных камнях</p>
-        </div>
-
-        <div class="space-y-4">
-            <!-- Таб 1 -->
-            <div class="glass-card rounded-xl p-6 cursor-pointer" onclick="toggleAccordion('tab1')">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-medium text-sm sm:text-base text-[#E0AAFF]">Природный vs Лабораторный бриллиант: в чем разница?</h3>
-                    <i id="icon-tab1" class="fas fa-chevron-down transition-transform"></i>
-                </div>
-                <div id="content-tab1" class="hidden mt-4 text-xs sm:text-sm text-gray-300 space-y-2 leading-relaxed">
-                    <p><strong>Физически, химически и оптически</strong> — они на 100% идентичны. Лабораторный бриллиант — это не подделка (не фианит и не муассанит), это настоящий алмаз, выращенный в контролируемых условиях, имитирующих земные недра.</p>
-                    <p>🔹 <em>Природный:</em> Формировался миллионы лет. Несет в себе коллекционную и инвестиционную ценность. Стоимость выше.</p>
-                    <p>🔹 <em>Лабораторный:</em> Идеально чистый экологичный камень без дефектов за гораздо более доступный бюджет (разница в цене может достигать 60-70%). Сертифицируется экспертами так же строго (IGI/GIA).</p>
-                </div>
-            </div>
-
-            <!-- Таб 2 -->
-            <div class="glass-card rounded-xl p-6 cursor-pointer" onclick="toggleAccordion('tab2')">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-medium text-sm sm:text-base text-[#E0AAFF]">Лайфхаки: Как выбрать кольцо для помолвки и не ошибиться?</h3>
-                    <i id="icon-tab2" class="fas fa-chevron-down transition-transform"></i>
-                </div>
-                <div id="content-tab2" class="hidden mt-4 text-xs sm:text-sm text-gray-300 space-y-3 leading-relaxed">
-                    <p>1. <strong>Правило 4C:</strong> Обращайте внимание на Carat (Вес), Color (Цвет — лучше D-H), Clarity (Чистота — от IF до VS2) и Cut (Огранка — выбирайте исключительно Excellent).</p>
-                    <p>2. <strong>Как узнать размер незаметно?</strong> Возьмите любое её кольцо (для безымянного или среднего пальца) и обведите внутренний контур на бумаге, либо наденьте на свой палец и отметьте ручкой, до куда оно доходит.</p>
-                    <p>3. <strong>Форма камня решает:</strong> Круглая огранка (Round) сияет ярче всех. Форма «Овал» или «Маркиз» визуально удлиняет пальцы и делает их изящнее.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ОПЛАТА И СРОКИ -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="glass-card rounded-3xl p-8 sm:p-12 bg-gradient-to-br from-[#2A115C]/60 to-[#12072B]/90 border-white/10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div class="space-y-4">
-                <h2 class="serif-font text-2xl sm:text-3xl font-bold tracking-wide">Гибкие условия покупки</h2>
-                <p class="text-sm text-gray-300 leading-relaxed">
-                    Мы ценим ваш комфорт и предлагаем премиальный сервис на каждом этапе. Вы можете приобрести украшения из наличия или заказать изготовление по вашим параметрам.
-                </p>
-                <div class="space-y-2 text-xs uppercase tracking-wider font-semibold text-[#E0AAFF]">
-                    <div class="flex items-center gap-3"><i class="fas fa-credit-card"></i> Оплата любой картой (Visa, MasterCard)</div>
-                    <div class="flex items-center gap-3"><i class="fas fa-percentage"></i> Доступна беспроцентная рассрочка</div>
-                    <div class="flex items-center gap-3"><i class="fas fa-clock"></i> Изготовление на заказ: от 10 до 14 рабочих дней</div>
-                </div>
-            </div>
-            <div class="flex justify-center">
-                <div class="border border-white/10 p-6 rounded-2xl text-center glass-card max-w-sm w-full">
-                    <h3 class="serif-font font-bold text-lg mb-2">Индивидуальный эскиз</h3>
-                    <p class="text-xs text-gray-400 mb-6">Отправьте нам референс желаемого кольца, и мы рассчитаем стоимость в разных вариантах каратности.</p>
-                    <a href="https://wa.me/77019475000" target="_blank" class="block w-full py-3 bg-white text-[#12072B] hover:bg-[#E0AAFF] rounded-xl text-xs uppercase tracking-widest font-bold transition">
-                        Рассчитать стоимость в WhatsApp
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- КОНТАКТЫ & ФУТЕР -->
-    <footer id="contacts" class="border-t border-white/10 mt-20 bg-black/40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-            <div class="space-y-4">
-                <h3 class="serif-font text-xl font-bold tracking-widest text-[#E0AAFF]">GEKKEL JEWELLERY</h3>
-                <p class="text-xs text-gray-400 font-light leading-relaxed">Создаем роскошные ювелирные изделия высшей категории качества. Сопровождаем каждую сделку официальными мировыми сертификатами.</p>
-            </div>
-            <div class="space-y-2">
-                <h4 class="text-xs uppercase tracking-widest font-bold text-white">Связаться с нами</h4>
-                <p class="text-sm text-gray-300 font-medium"><a href="tel:+77019475000" class="hover:text-[#E0AAFF]">+7 (701) 947-50-00</a></p>
-                <p class="text-xs text-gray-400">Консультация, заказ, уточнение статуса наличия (WhatsApp доступен по этому же номеру).</p>
-            </div>
-            <div class="space-y-4 flex flex-col items-center md:items-start">
-                <h4 class="text-xs uppercase tracking-widest font-bold text-white">Мы в соцсетях</h4>
-                <div class="flex space-x-4">
-                    <a href="https://www.instagram.com/gekkel_diamond/" target="_blank" class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:bg-[#9D4EDD] transition text-lg"><i class="fab fa-instagram"></i></a>
-                    <a href="https://wa.me/77019475000" target="_blank" class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:bg-[#25D366] transition text-lg"><i class="fab fa-whatsapp"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="bg-black/20 py-4 text-center text-[10px] text-gray-500 tracking-wider">
-            © 2026 GEKKEL JEWELLERY. Все права защищены.
-        </div>
-    </footer>
-
-    <!-- МОДАЛЬНОЕ ОКНО ДЛЯ ЗУМА ФОТО -->
-    <div id="zoom-modal" class="zoom-overlay" onclick="closeZoom()">
-        <button class="absolute top-6 right-6 text-2xl text-white opacity-70 hover:opacity-100 cursor-pointer"><i class="fas fa-times"></i></button>
-        <img id="zoom-img" src="" alt="Zoomed view" class="zoomed-img" onclick="event.stopPropagation(); toggleMagnify(this)">
     </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО КОРЗИНЫ -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/70 z-50 hidden justify-end">
-        <div class="w-full max-w-md bg-[#190C34] h-full p-6 flex flex-col justify-between shadow-2xl border-l border-white/10">
-            <div>
-                <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
-                    <h3 class="serif-font text-lg font-bold">Ваша корзина</h3>
-                    <button onclick="toggleCartModal()" class="text-xl opacity-60 hover:opacity-100 cursor-pointer"><i class="fas fa-times"></i></button>
-                </div>
-                <div id="cart-items" class="space-y-4 text-sm text-gray-300">
-                    <!-- Сюда JS добавляет выбранные товары -->
-                    <p class="text-center text-gray-500 py-8">Корзина пока пуста</p>
-                </div>
-            </div>
-            <div class="border-t border-white/10 pt-4 space-y-4">
-                <div class="flex justify-between font-bold text-lg">
-                    <span>Итого:</span>
-                    <span id="cart-total" class="text-[#E0AAFF]">0 ₸</span>
-                </div>
-                <button onclick="checkout()" class="w-full py-4 bg-gradient-to-r from-[#9D4EDD] to-[#7B2CBF] rounded-xl text-xs uppercase tracking-widest font-bold text-center block transition hover:opacity-90">
-                    Оформить (Карта / Рассрочка)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- СКРИПТЫ ДЛЯ ИНТЕРАКТИВА -->
-    <script>
-        // --- 1. ЭФФЕКТ 3D НАКЛОНА КАРТОЧЕК (TILT EFFECT) ---
-        function handleTilt(e, card) {
-            const cardRect = card.getBoundingClientRect();
-            const cardWidth = cardRect.width;
-            const cardHeight = cardRect.height;
-            
-            // Вычисляем координаты мыши относительно центра карточки
-            const mouseX = e.clientX - cardRect.left - cardWidth / 2;
-            const mouseY = e.clientY - cardRect.top - cardHeight / 2;
-            
-            // Рассчитываем углы поворота (макс 10 градусов)
-            const angleX = -(mouseY / cardHeight / 2) * 15;
-            const angleY = (mouseX / cardWidth / 2) * 15;
-            
-            card.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg) scale3d(1.02, 1.02, 1.02)`;
-            card.style.boxShadow = `0 20px 40px rgba(157, 78, 221, 0.2)`;
-        }
-
-        function resetTilt(card) {
-            card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            card.style.boxShadow = `none`;
-        }
-
-        // --- 2. ИНТЕРАКТИВНЫЙ ЗУМ (ПРИБЛИЖЕНИЕ ФОТО) ---
-        function openZoom(src) {
-            const modal = document.getElementById('zoom-modal');
-            const img = document.getElementById('zoom-img');
-            img.src = src;
-            img.classList.remove('magnified'); // сброс увеличения при открытии нового фото
-            modal.style.display = 'flex';
-        }
-
-        function closeZoom() {
-            document.getElementById('zoom-modal').style.display = 'none';
-        }
-
-        function toggleMagnify(img) {
-            img.classList.toggle('magnified');
-        }
-
-        // --- 3. АККОРДЕОН (ЛАЙФХАКИ И ТАБЫ) ---
-        function toggleAccordion(id) {
-            const content = document.getElementById(`content-${id}`);
-            const icon = document.getElementById(`icon-${id}`);
-            
-            content.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
-        }
-
-        // --- 4. СИМУЛЯЦИЯ КОРЗИНЫ ---
-        let cart = [];
-        
-        function addToCart(name, price) {
-            cart.push({ name, price });
-            updateCartUI();
-            toggleCartModal(); // Открываем корзину, чтобы показать добавленный товар
-        }
-
-        function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.length;
-            const container = document.getElementById('cart-items');
-            const totalContainer = document.getElementById('cart-total');
-            
-            if (cart.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 py-8">Корзина пока пуста</p>';
-                totalContainer.innerText = '0 ₸';
-                return;
-            }
-            
-            let html = '';
-            let total = 0;
-            cart.forEach((item, index) => {
-                total += item.price;
-                html += `
-                    <div class="flex justify-between items-center glass-card p-3 rounded-xl border-white/5">
-                        <div>
-                            <p class="font-medium text-xs sm:text-sm">${item.name}</p>
-                            <p class="text-xs text-[#E0AAFF] mt-0.5">${item.price.toLocaleString()} ₸</p>
-                        </div>
-                        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-500 text-xs px-2 py-1"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-            totalContainer.innerText = total.toLocaleString() + ' ₸';
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-        }
-
-        function toggleCartModal() {
-            const modal = document.getElementById('cart-modal');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        }
-
-        function checkout() {
-            if (cart.length === 0) {
-                alert('Добавьте товары в корзину для оформления заказа');
-                return;
-            }
-            // Перенаправляем на WhatsApp со списком заказанных товаров для обсуждения оплаты картой или в рассрочку
-            let message = 'Здравствуйте! Я хочу оформить заказ в GEKKEL JEWELLERY:\n\n';
-            cart.forEach((item, idx) => {
-                message += `${idx + 1}. ${item.name} — ${item.price.toLocaleString()} ₸\n`;
-            });
-            message += `\nИнтересует вариант оплаты (карта / рассрочка).`;
-            
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/77019475000?text=${encodedMessage}`, '_blank');
-        }
-    </script>
-</body>
-</html>
+  );
+}
