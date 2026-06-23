@@ -1,277 +1,397 @@
-import React, { useState } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stage, MeshReflectorMaterial } from '@react-three/drei';
-import { MotionAnimate } from 'react-motion-animate'; // Для плавных 3D-переходов при скролле
-import { FaInstagram, FaWhatsapp, FaShoppingBag, FaSearchPlus } from 'react-icons/fa';
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEKKEL JEWELLERY | Бриллианты и украшения</title>
+    <style>
+        :root {
+            --primary-color: #0A192F; /* Глубокий синий/черный для контраста */
+            --accent-color: #D4AF37; /* Элегантное золото */
+            --bg-color: #F8F9FA; /* Яркий, чистый фон */
+            --text-color: #333333;
+        }
 
-// --- Имитация 3D Модели Кольца (Базовый Меш для демонстрации 3D движения) ---
-function DiamondRingModel() {
-  return (
-    <mesh castShadow receiveShadow position={[0, -0.5, 0]} rotation={[0, Math.PI / 4, 0]}>
-      <torusGeometry args={[1, 0.15, 16, 100]} />
-      <meshStandardMaterial color="#E5E7EB" roughness={0.1} metalness={1} />
-      <mesh position={[0, 1.1, 0]}>
-        <octahedronGeometry args={[0.25]} />
-        <meshStandardMaterial color="#00F2FE" roughness={0} metalness={0.9} emissive="#00F2FE" emissiveIntensity={0.2} />
-      </mesh>
-    </mesh>
-  );
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
 
-// --- ДЕМО-ДАННЫЕ КАТАЛОГА (Сгенерировано 6 позиций для примера, легко расширяется до 50) ---
-const INITIAL_PRODUCTS = [
-  { id: 1, type: 'ring', name: 'Кольцо Eternity Classic', price: 450000, carat: 0.5, size: 16.5, shape: 'Круг', color: 'D (Бесцветный)', origin: 'Природный', status: 'В наличии', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80' },
-  { id: 2, type: 'ring', name: 'Кольцо Royal Emerald Cut', price: 1200000, carat: 1.5, size: 17.0, shape: 'Изумруд', color: 'E (Исключительный)', origin: 'Лабораторный', status: 'На заказ (7-14 дней)', img: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=600&q=80' },
-  { id: 3, type: 'pendant', name: 'Подвеска Halo Diamond', price: 380000, carat: 0.4, size: 'Универсальный', shape: 'Круг', color: 'F (Редкий)', origin: 'Природный', status: 'В наличии', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80' },
-  { id: 4, type: 'ring', name: 'Кольцо Solitaire Princess', price: 670000, carat: 0.8, size: 16.0, shape: 'Принцесса', color: 'D (Бесцветный)', origin: 'Лабораторный', status: 'В наличии', img: 'https://images.unsplash.com/photo-1543294001-f7cbfe92237e?auto=format&fit=crop&w=600&q=80' },
-  { id: 5, type: 'pendant', name: 'Колье Diamond Drop', price: 950000, carat: 1.2, size: 'Универсальный', shape: 'Капля', color: 'E (Исключительный)', origin: 'Природный', status: 'На заказ (10 дней)', img: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=80' },
-];
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
 
-export default function App() {
-  // Состояния для фильтров
-  const [filterType, setFilterType] = useState('all');
-  const [maxPrice, setMaxPrice] = useState(1500000);
-  const [carat, setCarat] = useState('all');
-  const [origin, setOrigin] = useState('all');
-  
-  // Состояние зума для фото
-  const [zoomedImg, setZoomedImg] = useState(null);
+        /* Header & Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(255, 255, 255, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
 
-  // Фильтрация товаров
-  const filteredProducts = INITIAL_PRODUCTS.filter(product => {
-    if (filterType !== 'all' && product.type !== filterType) return false;
-    if (product.price > maxPrice) return false;
-    if (origin !== 'all' && product.origin !== origin) return false;
-    if (carat !== 'all') {
-      if (carat === 'low' && product.carat >= 0.6) return false;
-      if (carat === 'high' && product.carat < 0.6) return false;
-    }
-    return true;
-  });
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
 
-  return (
-    <div className="bg-[#0B0C10] text-white min-h-screen font-sans selection:bg-[#00F2FE] selection:text-black">
-      
-      {/* --- НАВИГАЦИЯ / ШАПКА --- */}
-      <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[#0B0C10]/70 border-b border-gray-800 transition-all">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold tracking-widest text-[#00F2FE]">GEKKEL JEWELLERY</div>
-          <nav className="hidden md:flex space-x-8 text-sm tracking-widest uppercase">
-            <a href="#catalog" className="hover:text-[#00F2FE] transition">Каталог</a>
-            <a href="#edu" className="hover:text-[#00F2FE] transition">Гид по бриллиантам</a>
-            <a href="#contacts" className="hover:text-[#00F2FE] transition">Контакты</a>
-          </nav>
-          <div className="flex space-x-4 items-center">
-            <a href="https://www.instagram.com/gekkel_diamond/" target="_blank" rel="noreferrer" className="text-xl hover:text-[#00F2FE] transition"><FaInstagram /></a>
-            <a href="https://wa.me/77019475000" target="_blank" rel="noreferrer" className="text-xl hover:text-[#00F2FE] transition"><FaWhatsapp /></a>
-          </div>
+        .nav-links a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hero Section with 3D Effect */
+        .hero {
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            perspective: 1000px;
+            background: linear-gradient(135deg, #ffffff 0%, #e6e9f0 100%);
+            padding: 20px;
+        }
+
+        .hero-content {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            transform: translateZ(50px);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            transform: translateZ(30px);
+            letter-spacing: 1px;
+        }
+
+        /* Features */
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 40px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            text-align: center;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* Catalog & Filters */
+        .catalog-section {
+            padding: 60px 50px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+            background: white;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 40px;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Zoom Effect */
+        .img-container {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .img-container:hover img {
+            transform: scale(1.3); /* Функция приближения */
+        }
+
+        .product-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .product-price {
+            font-size: 1.4rem;
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .product-status {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--accent-color);
+        }
+
+        /* Education Section */
+        .education {
+            padding: 60px 50px;
+            background: #fff;
+        }
+
+        .education h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+
+        .edu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .edu-card {
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            background: var(--bg-color);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 40px 50px;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">GEKKEL JEWELLERY</div>
+        <div class="nav-links">
+            <a href="#catalog">Каталог</a>
+            <a href="#education">Гид покупателя</a>
+            <a href="https://wa.me/77019475000" target="_blank">WhatsApp</a>
+            <a href="#" onclick="alert('Корзина пока пуста')">🛒 Корзина</a>
         </div>
-      </header>
+    </header>
 
-      {/* --- ГЛАВНЫЙ ЭКРАН (3D ИНТЕРАКТИВ) --- */}
-      <section className="h-screen flex flex-col md:flex-row items-center justify-between pt-20 px-6 max-w-7xl mx-auto relative">
-        <div className="md:w-1/2 z-10 space-y-6 mt-12 md:mt-0">
-          <span className="text-[#00F2FE] text-xs uppercase tracking-widest font-semibold px-3 py-1 bg-[#00F2FE]/10 rounded-full border border-[#00F2FE]/20">Premium & Custom</span>
-          <h1 className="text-5xl md:text-7xl font-light tracking-tight leading-none">Совершенство в <br/><span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white via-[#00F2FE] to-white">каждой грани</span></h1>
-          <p className="text-gray-400 text-lg max-w-md font-light">Природные и лабораторные бриллианты топ-характеристик с международными сертификатами GIA и IGI. Создание шедевров на заказ.</p>
-          <div className="flex space-x-4 pt-4">
-            <a href="#catalog" className="bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-black font-semibold px-8 py-4 rounded-none hover:shadow-[0_0_30px_rgba(0,242,254,0.5)] transition tracking-wider uppercase text-xs">Смотреть каталог</a>
-            <a href="https://wa.me/77019475000" className="border border-white/20 hover:border-[#00F2FE] px-8 py-4 text-xs uppercase tracking-wider transition">Консультация</a>
-          </div>
+    <section class="hero" id="hero">
+        <div class="hero-content" id="hero-content">
+            <p>▪️ Бриллианты природные и лабораторные ▪️</p>
+            <h1>Истинное сияние</h1>
+            <p>Топ характеристики | Сертификаты GIA и IGI | На заказ</p>
         </div>
+    </section>
 
-        {/* 3D Сцена с кольцом */}
-        <div className="w-full md:w-1/2 h-[50vh] md:h-[80vh] cursor-grab active:cursor-grabbing">
-          <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
-            <ambientLight intensity={0.5} />
-            <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-            <pointLight position={[-10, -10, -10]} />
-            <Stage environment="city" intensity={0.6}>
-              <DiamondRingModel />
-            </Stage>
-            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-          </Canvas>
-          <div className="text-center text-xs text-gray-500 uppercase tracking-widest -mt-10">Взаимодействуйте: вращайте 3D модель</div>
-        </div>
-      </section>
+    <section class="features">
+        <div class="feature-item">💎 Безупречная огранка</div>
+        <div class="feature-item">💳 Оплата картой и в рассрочку</div>
+        <div class="feature-item">🌍 Доставка по всему миру</div>
+    </section>
 
-      {/* --- БЛОК ПРЕИМУЩЕСТВ --- */}
-      <section className="py-20 border-t border-b border-gray-900 bg-black/40">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          <div>
-            <div className="text-[#00F2FE] text-3xl font-light mb-2">GIA / IGI</div>
-            <p className="text-xs uppercase tracking-wider text-gray-400">100% Сертификация</p>
-          </div>
-          <div>
-            <div className="text-[#00F2FE] text-3xl font-light mb-2">Топ 4C</div>
-            <p className="text-xs uppercase tracking-wider text-gray-400">Высшие характеристики</p>
-          </div>
-          <div>
-            <div className="text-[#00F2FE] text-3xl font-light mb-2">Лаб & Натур</div>
-            <p className="text-xs uppercase tracking-wider text-gray-400">Любые виды бриллиантов</p>
-          </div>
-          <div>
-            <div className="text-[#00F2FE] text-3xl font-light mb-2">Индивидуально</div>
-            <p className="text-xs uppercase tracking-wider text-gray-400">Изготовление на заказ</p>
-          </div>
-        </div>
-      </section>
-
-      {/* --- КАТАЛОГ С ИНТЕЛЛЕКТУАЛЬНЫМ ФИЛЬТРОМ --- */}
-      <section id="catalog" className="py-24 max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
-          <div>
-            <h2 className="text-3xl font-light tracking-widest uppercase">Экспозиция изделий</h2>
-            <p className="text-gray-500 mt-2">Минималистичные кадры, точные характеристики.</p>
-          </div>
-          {/* Тип украшения */}
-          <div className="flex space-x-4 mt-6 md:mt-0 overflow-x-auto pb-2">
-            {['all', 'ring', 'pendant'].map((t) => (
-              <button key={t} onClick={() => setFilterType(t)} className={`px-6 py-2 text-xs uppercase tracking-widest border transition ${filterType === t ? 'border-[#00F2FE] text-[#00F2FE] bg-[#00F2FE]/5' : 'border-gray-800 text-gray-400'}`}>
-                {t === 'all' ? 'Все' : t === 'ring' ? 'Кольца' : 'Подвески'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ПАНЕЛЬ ФИЛЬТРОВ */}
-        <div className="bg-[#12141C] p-6 rounded-none mb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 border border-gray-900">
-          <div>
-            <label className="block text-xs uppercase text-gray-400 tracking-wider mb-2">Бюджет (до: {maxPrice.toLocaleString()} ₸)</label>
-            <input type="range" min="300000" max="1500000" step="50000" value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-full accent-[#00F2FE]" />
-          </div>
-          <div>
-            <label className="block text-xs uppercase text-gray-400 tracking-wider mb-2">Происхождение</label>
-            <select value={origin} onChange={(e) => setOrigin(e.target.value)} className="w-full bg-black border border-gray-800 p-2 text-xs text-gray-300 focus:border-[#00F2FE] outline-none">
-              <option value="all">Все бриллианты</option>
-              <option value="Природный">Природные</option>
-              <option value="Лабораторный">Лабораторные (HPHT/CVD)</option>
+    <section class="catalog-section" id="catalog">
+        <div class="filters">
+            <select id="filter-type">
+                <option value="all">Все изделия</option>
+                <option value="ring">Кольца</option>
+                <option value="pendant">Подвески</option>
             </select>
-          </div>
-          <div>
-            <label className="block text-xs uppercase text-gray-400 tracking-wider mb-2">Каратность (Ct)</label>
-            <select value={carat} onChange={(e) => setCarat(e.target.value)} className="w-full bg-black border border-gray-800 p-2 text-xs text-gray-300 focus:border-[#00F2FE] outline-none">
-              <option value="all">Любой вес</option>
-              <option value="low">До 0.6 Ct</option>
-              <option value="high">От 0.6 Ct и выше</option>
+            <select id="filter-stone">
+                <option value="all">Тип камня</option>
+                <option value="natural">Природный</option>
+                <option value="lab">Лабораторный</option>
             </select>
-          </div>
-          <div className="flex items-end text-xs text-gray-500">
-            Найдено позиций: {filteredProducts.length} из 50
-          </div>
+            <select id="filter-price">
+                <option value="all">Любая цена</option>
+                <option value="low">До 500,000 ₸</option>
+                <option value="high">От 500,000 ₸</option>
+            </select>
         </div>
 
-        {/* СЕТКА С ТОВАРАМИ (По 1 штуке в минималистичном стиле) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="group bg-black/40 border border-gray-900 overflow-hidden hover:border-[#00F2FE]/40 transition duration-500 relative flex flex-col justify-between">
-              
-              {/* Изображение с функцией Zoom */}
-              <div className="relative overflow-hidden bg-gray-950 aspect-square">
-                <img src={product.img} alt={product.name} className="object-cover w-full h-full transform group-hover:scale-105 transition duration-700 opacity-90 group-hover:opacity-100" />
-                <span className={`absolute top-4 left-4 text-[10px] uppercase tracking-widest px-2 py-1 text-black font-semibold ${product.status === 'В наличии' ? 'bg-[#00F2FE]' : 'bg-amber-400'}`}>
-                  {product.status}
-                </span>
-                {/* Иконка Приближения */}
-                <button onClick={() => setZoomedImg(product.img)} className="absolute bottom-4 right-4 bg-black/60 p-3 text-white hover:text-[#00F2FE] backdrop-blur-sm opacity-0 group-hover:opacity-100 transition duration-300">
-                  <FaSearchPlus />
-                </button>
-              </div>
+        <div class="catalog-grid" id="catalog-grid">
+            <!-- Товары будут генерироваться через JavaScript -->
+        </div>
+    </section>
 
-              {/* Данные товара */}
-              <div className="p-6 space-y-4 flex-grow flex flex-col justify-between">
-                <div>
-                  <h3 className="font-medium text-lg tracking-wide group-hover:text-[#00F2FE] transition">{product.name}</h3>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 mt-3 pt-3 border-t border-gray-900">
-                    <div>Вес: <span className="text-white">{product.carat} Ct</span></div>
-                    <div>Форма: <span className="text-white">{product.shape}</span></div>
-                    <div>Цвет: <span className="text-white">{product.color}</span></div>
-                    <div>Тип: <span className="text-white">{product.origin}</span></div>
-                    {product.type === 'ring' && <div>Размер: <span className="text-white">{product.size}</span></div>}
-                  </div>
-                </div>
+    <section class="education" id="education">
+        <h2>Гид по выбору идеального украшения</h2>
+        <div class="edu-grid">
+            <div class="edu-card">
+                <h3>Природный vs Лабораторный</h3>
+                <p>Лабораторные бриллианты имеют те же физические и химические свойства, что и природные. Разница лишь в происхождении: одни созданы природой за миллионы лет, другие — выращены в лаборатории с идеальными характеристиками.</p>
+            </div>
+            <div class="edu-card">
+                <h3>Лайфхак: Как узнать размер кольца?</h3>
+                <p>Оберните нитку вокруг пальца, измерьте её длину в миллиметрах и разделите на 3.14. Полученное число — это и есть размер кольца (например, 16.5 или 17).</p>
+            </div>
+            <div class="edu-card">
+                <h3>Что такое сертификат GIA / IGI?</h3>
+                <p>Это независимый паспорт камня, подтверждающий его подлинность и характеристики (вес, цвет, чистота, огранка).</p>
+            </div>
+        </div>
+    </section>
 
-                <div className="pt-4 border-t border-gray-900">
-                  <div className="text-xl font-semibold tracking-wider text-[#00F2FE] mb-4">{product.price.toLocaleString()} ₸</div>
-                  
-                  {/* Способы оплаты и корзина */}
-                  <div className="space-y-2">
-                    <button className="w-full bg-white text-black hover:bg-[#00F2FE] hover:text-black font-medium py-3 text-xs uppercase tracking-widest transition flex items-center justify-center space-x-2">
-                      <FaShoppingBag /> <span>В корзину</span>
-                    </button>
-                    <div className="grid grid-cols-2 gap-2 text-[10px] text-center uppercase tracking-wider">
-                      <div className="border border-gray-800 py-2 text-gray-400">Картой Online</div>
-                      <div className="border border-[#00F2FE]/30 py-2 text-[#00F2FE] bg-[#00F2FE]/5">В Рассрочку 0%</div>
+    <footer>
+        <h2>GEKKEL JEWELLERY</h2>
+        <p style="margin: 20px 0;">Свяжитесь с нами для консультации или индивидуального заказа</p>
+        <p>📞 Телефон / WhatsApp: <a href="https://wa.me/77019475000">+7 701 947 5000</a></p>
+        <p>📸 Instagram: <a href="https://www.instagram.com/gekkel_diamond/" target="_blank">@gekkel_diamond</a></p>
+    </footer>
+
+    <script>
+        // 3D эффект движения в Hero секции
+        const hero = document.getElementById('hero');
+        const heroContent = document.getElementById('hero-content');
+
+        hero.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            heroContent.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        hero.addEventListener('mouseleave', () => {
+            heroContent.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+
+        // База данных товаров (здесь можно добавить до 50 штук)
+        const products = [
+            { id: 1, name: "Кольцо Solitaire (Природный)", type: "ring", stone: "natural", price: 850000, carat: "1.0 ct", status: "В наличии", image: "https://images.unsplash.com/photo-1605100804763-247f66126e28?auto=format&fit=crop&w=600&q=80" },
+            { id: 2, name: "Подвеска Halo (Лаб.)", type: "pendant", stone: "lab", price: 320000, carat: "0.8 ct", status: "На заказ (ждать 10-14 дней)", image: "https://images.unsplash.com/photo-1599643478524-fb66f70a00f0?auto=format&fit=crop&w=600&q=80" },
+            { id: 3, name: "Кольцо Eternity (Лаб.)", type: "ring", stone: "lab", price: 450000, carat: "2.0 ct", status: "В наличии", image: "https://images.unsplash.com/photo-1603561596112-0a132b757442?auto=format&fit=crop&w=600&q=80" },
+            { id: 4, name: "Кольцо Three-Stone (Природный)", type: "ring", stone: "natural", price: 1200000, carat: "1.5 ct", status: "На заказ (ждать 20 дней)", image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=600&q=80" },
+        ];
+
+        const catalogGrid = document.getElementById('catalog-grid');
+
+        // Функция отрисовки каталога
+        function renderCatalog(items) {
+            catalogGrid.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <div class="img-container">
+                        <img src="${item.image}" alt="${item.name}">
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+                    <div class="product-info">
+                        <h3>${item.name}</h3>
+                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 5px;">Каратность: ${item.carat}</p>
+                        <p class="product-status"><b>Статус:</b> ${item.status}</p>
+                        <p class="product-price">${item.price.toLocaleString('ru-RU')} ₸</p>
+                        <button class="btn" onclick="alert('Товар добавлен в корзину. Доступна рассрочка и оплата картой.')">В корзину</button>
+                    </div>
+                `;
+                catalogGrid.appendChild(card);
+            });
+        }
 
-      {/* --- ИНФОРМАЦИОННЫЙ БЛОК / ЛАЙФХАКИ --- */}
-      <section id="edu" className="py-24 border-t border-gray-900 bg-[#0E1017]">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-light tracking-widest text-center uppercase mb-16">Экспертный гид GEKKEL</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Лайфхак 1 */}
-            <div className="border-l-2 border-[#00F2FE] pl-6 space-y-3">
-              <h3 className="text-xl font-medium">Природные vs Лабораторные бриллианты</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                С химической, физической и оптической точек зрения они абсолютно идентичны (оба состоят из чистого углерода и имеют твердость 10 по Моосу). Разница лишь в происхождении. Природные создавались миллионы лет в недрах земли, а лабораторные выращиваются в современных лабораториях по технологиям HPHT/CVD. Лабораторные позволяют получить чистейшие характеристики **на 50-70% доступнее**.
-              </p>
-            </div>
-            
-            {/* Лайфхак 2 */}
-            <div className="border-l-2 border-[#00F2FE] pl-6 space-y-3">
-              <h3 className="text-xl font-medium">Как выбрать идеальное кольцо для помолвки?</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Ориентируйтесь на правило **4C**: Carat (Вес), Cut (Огранка), Color (Цвет), Clarity (Чистота). Если важен визуальный размер — выбирайте форму «Маркиз» или «Овал», они кажутся крупнее круглых при одинаковом весе. И всегда требуйте сертификаты **GIA** или **IGI** — это гарантия подлинности ваших инвестиций.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+        // Первичная отрисовка
+        renderCatalog(products);
 
-      {/* --- МОДАЛЬНОЕ ОКНО ПРИБЛИЖЕНИЯ ФОТО (ZOOM) --- */}
-      {zoomedImg && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md" onClick={() => setZoomedImg(null)}>
-          <div className="relative max-w-4xl max-h-[90vh] overflow-hidden">
-            <img src={zoomedImg} alt="Zoomed view" className="object-contain max-w-full max-h-[85vh] scale-125 cursor-zoom-out transition duration-300" />
-            <div className="text-center text-xs text-gray-400 mt-4 tracking-widest">Кликните в любом месте, чтобы закрыть</div>
-          </div>
-        </div>
-      )}
+        // Логика фильтров
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', () => {
+                const type = document.getElementById('filter-type').value;
+                const stone = document.getElementById('filter-stone').value;
+                const price = document.getElementById('filter-price').value;
 
-      {/* --- ПОДВАЛ / КОНТАКТЫ --- */}
-      <footer id="contacts" className="bg-black py-16 border-t border-gray-900 text-gray-500 text-sm">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
-          <div className="space-y-4">
-            <div className="text-white text-xl font-bold tracking-widest">GEKKEL JEWELLERY</div>
-            <p className="text-xs max-w-xs leading-relaxed">Эксклюзивные ювелирные изделия с сертифицированными бриллиантами высшей пробы.</p>
-          </div>
-          <div className="space-y-2">
-            <div className="text-white text-xs uppercase tracking-widest font-semibold mb-4">Связь и заказ</div>
-            <a href="tel:+77019475000" className="block hover:text-white transition text-lg text-gray-300">+7 701 947 5000</a>
-            <a href="https://wa.me/77019475000" className="flex items-center space-x-2 text-[#00F2FE] hover:underline pt-2">
-              <FaWhatsapp /> <span>Написать в WhatsApp</span>
-            </a>
-          </div>
-          <div className="space-y-2">
-            <div className="text-white text-xs uppercase tracking-widest font-semibold mb-4">Социальные сети</div>
-            <a href="https://www.instagram.com/gekkel_diamond/" target="_blank" rel="noreferrer" className="flex items-center space-x-2 hover:text-white transition">
-              <FaInstagram /> <span>@gekkel_diamond</span>
-            </a>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-gray-950 text-center text-xs">
-          &copy; {new Date().getFullYear()} GEKKEL JEWELLERY. Все права защищены.
-        </div>
-      </footer>
+                const filtered = products.filter(item => {
+                    const matchType = type === 'all' || item.type === type;
+                    const matchStone = stone === 'all' || item.stone === stone;
+                    let matchPrice = true;
+                    if (price === 'low') matchPrice = item.price <= 500000;
+                    if (price === 'high') matchPrice = item.price > 500000;
+                    
+                    return matchType && matchStone && matchPrice;
+                });
 
-    </div>
-  );
-}
+                renderCatalog(filtered);
+            });
+        });
+    </script>
+</body>
+</html>
