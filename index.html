@@ -1,457 +1,379 @@
 <!DOCTYPE html>
-<html lang="ru" class="scroll-smooth">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEKKEL JEWELLERY — Эксклюзивные Бриллиантовые Украшения</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Google Fonts & FontAwesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>GEKKEL JEWELLERY | Премиальные бриллианты</title>
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #12072B 0%, #2A115C 50%, #12072B 100%);
+        /* Основная цветовая палитра и шрифты */
+        :root {
+            --primary-lilac: #4a235a; /* Богатый темный сиреневый */
+            --light-lilac: #f4ecf7;
+            --accent: #a569bd;
+            --text-color: #ffffff;
+            --dark-text: #333333;
         }
-        .serif-font {
-            font-family: 'Cinzel', serif;
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--primary-lilac);
+            color: var(--text-color);
+            scroll-behavior: smooth;
         }
-        /* Эффект стеклянного размытия (Glassmorphism) */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+
+        /* Шапка сайта */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background-color: rgba(74, 35, 90, 0.9);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
         }
-        /* 3D эффект для карточек */
-        .tilt-card {
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        .logo {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 3px;
         }
-        /* Модальное окно зума */
-        .zoom-overlay {
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--accent); }
+
+        /* Главный экран */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #2c1338 0%, #4a235a 100%);
+            padding-top: 80px;
+        }
+
+        .hero h1 {
+            font-size: 50px;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .btn-main {
+            padding: 15px 40px;
+            background-color: var(--text-color);
+            color: var(--primary-lilac);
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 30px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-main:hover {
+            transform: scale(1.05) translateY(-3px); /* 3D эффект наведения */
+            box-shadow: 0 8px 25px rgba(255,255,255,0.2);
+        }
+
+        /* УТП */
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 40px 20px;
+            background-color: var(--light-lilac);
+            color: var(--dark-text);
+        }
+
+        .feature-item {
+            text-align: center;
+            max-width: 200px;
+        }
+
+        /* Каталог */
+        .catalog {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .catalog h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 50px;
+            font-weight: 300;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background-color: var(--light-lilac);
+            border-radius: 10px;
+            overflow: hidden;
+            color: var(--dark-text);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: perspective(1000px) translateZ(20px) scale(1.03); /* Имитация 3D при наведении */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        .card-img-placeholder {
+            height: 250px;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            /* Сюда будут вставляться ваши фотографии через тег <img> */
+            overflow: hidden;
+        }
+        
+        .card-img-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .card-img-placeholder img {
+            transform: scale(1.1); /* Эффект лупы / приближения фото */
+        }
+
+        .card-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .status {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: var(--primary-lilac);
+        }
+
+        /* Блог / Инфо */
+        .info-section {
+            background-color: var(--light-lilac);
+            color: var(--dark-text);
+            padding: 80px 20px;
+        }
+
+        .info-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            gap: 40px;
+        }
+
+        .info-block {
+            flex: 1;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Кнопка WhatsApp */
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #25D366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .whatsapp-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Модальное окно (Корзина/Оплата) - скрыто по умолчанию */
+        .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(18, 7, 43, 0.95);
-            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
             justify-content: center;
             align-items: center;
         }
-        .zoomed-img {
-            max-width: 90%;
-            max-height: 85vh;
-            transform: scale(1);
-            transition: transform 0.3s ease;
-            cursor: zoom-in;
+        .modal-content {
+            background: white;
+            color: var(--dark-text);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
         }
-        .zoomed-img.magnified {
-            transform: scale(2);
-            cursor: zoom-out;
-        }
+        .close-btn { margin-top: 20px; cursor: pointer; color: var(--accent); text-decoration: underline; }
+
     </style>
 </head>
-<body class="text-white min-h-screen antialiased selection:bg-[#9D4EDD] selection:text-white">
+<body>
 
-    <!-- НАВИГАЦИЯ -->
-    <header class="sticky top-0 z-50 glass-card border-b border-white/10 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="serif-font text-2xl font-bold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-[#E0AAFF] to-white">
-                GEKKEL
-            </a>
-            
-            <nav class="hidden md:flex space-x-8 text-sm uppercase tracking-widest font-medium">
-                <a href="#catalog" class="hover:text-[#E0AAFF] transition">Каталог</a>
-                <a href="#features" class="hover:text-[#E0AAFF] transition">Преимущества</a>
-                <a href="#education" class="hover:text-[#E0AAFF] transition">Гид по бриллиантам</a>
-                <a href="#contacts" class="hover:text-[#E0AAFF] transition">Контакты</a>
-            </nav>
-
-            <div class="flex items-center space-x-4">
-                <a href="https://www.instagram.com/gekkel_diamond/" target="_blank" class="text-xl hover:text-[#E0AAFF] transition"><i class="fab fa-instagram"></i></a>
-                <a href="https://wa.me/77019475000" target="_blank" class="text-xl hover:text-[#E0AAFF] transition"><i class="fab fa-whatsapp"></i></a>
-                <!-- Корзина -->
-                <button onclick="toggleCartModal()" class="relative p-2 hover:text-[#E0AAFF] transition cursor-pointer">
-                    <i class="fas fa-shopping-bag text-xl"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-[#9D4EDD] text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
-                </button>
-            </div>
+    <header>
+        <div class="logo">GEKKEL JEWELLERY</div>
+        <div class="nav-links">
+            <a href="#catalog">Каталог</a>
+            <a href="#info">О бриллиантах</a>
+            <a href="https://www.instagram.com/gekkel_diamond/" target="_blank">Instagram</a>
+            <a href="tel:+77019475000">+7 701 947 5000</a>
         </div>
     </header>
 
-    <!-- ГЛАВНЫЙ ЭКРАН (HERO SECTION) -->
-    <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden px-4">
-        <!-- Декоративные 3D светящиеся сферы на фоне -->
-        <div class="absolute top-1/4 left-10 w-72 h-72 bg-[#7B2CBF]/20 rounded-full blur-[120px] animate-pulse"></div>
-        <div class="absolute bottom-1/4 right-10 w-96 h-96 bg-[#3C096C]/40 rounded-full blur-[150px]"></div>
+    <section class="hero">
+        <h1>Элегантность в каждой грани</h1>
+        <p>Исключительные кольца и подвески. Природные и лабораторные бриллианты с сертификатами GIA и IGI. Создаем украшения вашей мечты на заказ.</p>
+        <a href="#catalog" class="btn-main">Смотреть коллекцию</a>
+    </section>
 
-        <div class="max-w-5xl mx-auto text-center z-10 space-y-6">
-            <span class="text-xs uppercase tracking-[0.4em] text-[#E0AAFF] font-semibold block">Природные и лабораторные бриллианты</span>
-            <h1 class="serif-font text-4xl sm:text-6xl lg:text-7xl font-bold tracking-wide leading-tight">
-                Магия совершенства <br>в каждой грани
-            </h1>
-            <p class="max-w-2xl mx-auto text-sm sm:text-base text-gray-300 font-light tracking-wide">
-                Топ характеристики, международные сертификаты GIA и IGI. Создаем шедевры ювелирного искусства в наличии и под индивидуальный заказ.
-            </p>
-            <div class="pt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="#catalog" class="px-8 py-4 bg-gradient-to-r from-[#9D4EDD] to-[#7B2CBF] hover:from-[#7B2CBF] hover:to-[#5A189A] text-sm uppercase tracking-widest font-semibold rounded-full shadow-lg shadow-[#7B2CBF]/30 transition transform hover:-translate-y-1 w-full sm:w-auto">
-                    Смотреть каталог
-                </a>
-                <a href="https://wa.me/77019475000" target="_blank" class="px-8 py-4 border border-white/20 hover:border-white/60 text-sm uppercase tracking-widest font-semibold rounded-full transition glass-card w-full sm:w-auto text-center">
-                    Консультация ювелира
-                </a>
+    <section class="features">
+        <div class="feature-item">
+            <h3>💎 Бриллианты</h3>
+            <p>Природные и лабораторные топ-характеристик</p>
+        </div>
+        <div class="feature-item">
+            <h3>📜 Сертификаты</h3>
+            <p>Международные стандарты GIA и IGI</p>
+        </div>
+        <div class="feature-item">
+            <h3>💍 На заказ</h3>
+            <p>Индивидуальное изготовление по вашим меркам</p>
+        </div>
+        <div class="feature-item">
+            <h3>💳 Удобная оплата</h3>
+            <p>Оплата картой онлайн и возможность рассрочки</p>
+        </div>
+    </section>
+
+    <section id="catalog" class="catalog">
+        <h2>Наши украшения</h2>
+        <div class="grid">
+            <div class="card" onclick="openModal('Кольцо с бриллиантом 1 карат', 'В наличии', '1 500 000 ₸')">
+                <div class="card-img-placeholder">
+                    <span>[Фото кольца 1]</span>
+                </div>
+                <div class="card-info">
+                    <div class="status">В наличии</div>
+                    <h3>Помолвочное кольцо Halo</h3>
+                    <div class="price">1 500 000 ₸</div>
+                </div>
+            </div>
+            <div class="card" onclick="openModal('Кольцо с бриллиантом', 'На заказ (10-14 дней)', '1 200 000 ₸')">
+                <div class="card-img-placeholder">
+                    <span>[Фото кольца 2]</span>
+                </div>
+                <div class="card-info">
+                    <div class="status">На заказ (10-14 дней)</div>
+                    <h3>Кольцо Классика</h3>
+                    <div class="price">1 200 000 ₸</div>
+                </div>
+            </div>
+             <div class="card" onclick="openModal('Подвеска Лотос', 'В наличии', '850 000 ₸')">
+                <div class="card-img-placeholder">
+                    <span>[Фото подвески]</span>
+                </div>
+                <div class="card-info">
+                    <div class="status">В наличии</div>
+                    <h3>Подвеска с сапфиром</h3>
+                    <div class="price">850 000 ₸</div>
+                </div>
+            </div>
+            <div class="card"><div class="card-img-placeholder"><span>[Место для фото]</span></div><div class="card-info"><h3>Изделие 4</h3></div></div>
+            <div class="card"><div class="card-img-placeholder"><span>[Место для фото]</span></div><div class="card-info"><h3>Изделие 5</h3></div></div>
+            <div class="card"><div class="card-img-placeholder"><span>[Место для фото]</span></div><div class="card-info"><h3>Изделие 6</h3></div></div>
+            <div class="card"><div class="card-img-placeholder"><span>[Место для фото]</span></div><div class="card-info"><h3>Изделие 7</h3></div></div>
+            <div class="card"><div class="card-img-placeholder"><span>[Место для фото]</span></div><div class="card-info"><h3>Изделие 8</h3></div></div>
+        </div>
+    </section>
+
+    <section id="info" class="info-section">
+        <div class="info-container">
+            <div class="info-block">
+                <h2>Как выбрать кольцо?</h2>
+                <p>Выбор кольца начинается с определения бюджета и формы камня. Обратите внимание на систему "4C": Cut (огранка), Color (цвет), Clarity (чистота) и Carat (вес). Мы поможем подобрать идеальный баланс этих характеристик, чтобы камень сиял максимально ярко.</p>
+            </div>
+            <div class="info-block">
+                <h2>Природный или лабораторный?</h2>
+                <p>Лабораторные бриллианты на 100% идентичны природным по своим физическим, химическим и оптическим свойствам. Разница лишь в происхождении: одни созданы природой за миллионы лет, другие — в лаборатории за несколько недель. Оба варианта вечны.</p>
             </div>
         </div>
     </section>
 
-    <!-- ПРЕИМУЩЕСТВА (БАННЕРЫ ИНФО) -->
-    <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div class="glass-card p-6 rounded-2xl text-center border-white/5">
-            <i class="fas fa-gem text-2xl text-[#E0AAFF] mb-3"></i>
-            <h3 class="text-xs sm:text-sm uppercase tracking-wider font-semibold">Любые бриллианты</h3>
-            <p class="text-xs text-gray-400 mt-1">Природные и лабораторные (Lab-Grown)</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl text-center border-white/5">
-            <i class="fas fa-star text-2xl text-[#E0AAFF] mb-3"></i>
-            <h3 class="text-xs sm:text-sm uppercase tracking-wider font-semibold">Топ характеристики</h3>
-            <p class="text-xs text-gray-400 mt-1">Идеальная огранка, цвет и чистота</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl text-center border-white/5">
-            <i class="fas fa-certificate text-2xl text-[#E0AAFF] mb-3"></i>
-            <h3 class="text-xs sm:text-sm uppercase tracking-wider font-semibold">Сертификация</h3>
-            <p class="text-xs text-gray-400 mt-1">Строгие стандарты GIA и IGI</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl text-center border-white/5">
-            <i class="fas fa-pencil-ruler text-2xl text-[#E0AAFF] mb-3"></i>
-            <h3 class="text-xs sm:text-sm uppercase tracking-wider font-semibold">На заказ</h3>
-            <p class="text-xs text-gray-400 mt-1">Реализуем эскиз любой сложности</p>
-        </div>
-    </section>
+    <a href="https://wa.me/77019475000?text=Здравствуйте!%20Я%20перешел(ла)%20с%20вашего%20сайта,%20меня%20заинтересовали%20украшения." class="whatsapp-btn" target="_blank" title="Написать в WhatsApp">
+        <svg viewBox="0 0 32 32" width="35" height="35" fill="white"><path d="M16.002 0c-8.836 0-16.002 7.164-16.002 16.002 0 2.804 0.725 5.438 1.996 7.746l-2.008 7.318 7.48-1.968c2.262 1.182 4.814 1.848 7.498 1.848 8.834 0 16-7.166 16-16.002s-7.166-16-16-16zM24.716 21.674c-0.34 0.958-1.748 1.83-2.614 1.916-0.78 0.078-1.776 0.28-5.116-1.106-4.032-1.672-6.646-5.786-6.848-6.056-0.204-0.268-1.636-2.18-1.636-4.162s1.026-2.964 1.396-3.344c0.37-0.378 0.796-0.472 1.062-0.472s0.536-0.008 0.772 0.004c0.246 0.014 0.578-0.092 0.906 0.696 0.34 0.816 1.124 2.748 1.226 2.956 0.102 0.206 0.17 0.448 0.034 0.716-0.134 0.266-0.204 0.43-0.408 0.672-0.204 0.24-0.422 0.526-0.612 0.728-0.206 0.222-0.426 0.464-0.188 0.87 0.236 0.408 1.050 1.738 2.254 2.808 1.556 1.384 2.85 1.814 3.258 2.022 0.408 0.206 0.646 0.172 0.884-0.102 0.238-0.274 1.020-1.192 1.292-1.602 0.272-0.408 0.544-0.34 0.916-0.204 0.374 0.136 2.38 1.122 2.788 1.326 0.408 0.204 0.68 0.306 0.782 0.476 0.102 0.17 0.102 0.986-0.238 1.944z"></path></svg>
+    </a>
 
-    <!-- ИНТЕРАКТИВНЫЙ КАТАЛОГ -->
-    <section id="catalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center mb-12">
-            <h2 class="serif-font text-3xl sm:text-4xl font-bold tracking-widest">Коллекции GEKKEL</h2>
-            <p class="text-xs sm:text-sm text-[#E0AAFF] tracking-widest uppercase mt-2">Эксклюзивный выбор прямо сейчас</p>
-        </div>
-
-        <!-- Сетка товаров -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            <!-- Карточка 1: Кольцо -->
-            <div class="tilt-card glass-card rounded-2xl overflow-hidden group flex flex-col justify-between" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
-                <div class="relative overflow-hidden bg-black/20 aspect-square flex items-center justify-center">
-                    <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80" alt="Кольцо Royal Promise" class="w-full h-full object-cover transition duration-500 group-hover:scale-105 cursor-zoom-in" onclick="openZoom(this.src)">
-                    <span class="absolute top-4 left-4 bg-[#9D4EDD] text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full">В наличии</span>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs text-gray-400 uppercase tracking-widest">Кольца</span>
-                            <h3 class="serif-font text-lg font-semibold mt-1">Royal Promise White</h3>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-lg font-bold block text-[#E0AAFF]">850 000 ₸</span>
-                            <span class="text-[10px] text-gray-400 block">Рассрочка от 70 833 ₸/мес</span>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-300 font-light line-clamp-2">Белое золото 585 пробы, центральный природный бриллиант 0.7 карата, GIA сертификат.</p>
-                    <button onclick="addToCart('Кольцо Royal Promise White', 850000)" class="w-full py-3 bg-white/10 hover:bg-[#9D4EDD] rounded-xl text-xs uppercase tracking-widest font-semibold transition cursor-pointer">
-                        В корзину
-                    </button>
-                </div>
-            </div>
-
-            <!-- Карточка 2: Подвеска -->
-            <div class="tilt-card glass-card rounded-2xl overflow-hidden group flex flex-col justify-between" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
-                <div class="relative overflow-hidden bg-black/20 aspect-square flex items-center justify-center">
-                    <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80" alt="Подвеска Aura" class="w-full h-full object-cover transition duration-500 group-hover:scale-105 cursor-zoom-in" onclick="openZoom(this.src)">
-                    <span class="absolute top-4 left-4 bg-amber-600 text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full">На заказ (10-14 дней)</span>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs text-gray-400 uppercase tracking-widest">Подвески</span>
-                            <h3 class="serif-font text-lg font-semibold mt-1">Aura Diamond Drop</h3>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-lg font-bold block text-[#E0AAFF]">540 000 ₸</span>
-                            <span class="text-[10px] text-gray-400 block">Рассрочка от 45 000 ₸/мес</span>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-300 font-light line-clamp-2">Желтое золото 750 пробы, лабораторный бриллиант каплевидной огранки 0.5 карата, IGI сертификат.</p>
-                    <button onclick="addToCart('Подвеска Aura Diamond Drop', 540000)" class="w-full py-3 bg-white/10 hover:bg-[#9D4EDD] rounded-xl text-xs uppercase tracking-widest font-semibold transition cursor-pointer">
-                        В корзину
-                    </button>
-                </div>
-            </div>
-
-            <!-- Карточка 3: Кольцо на заказ -->
-            <div class="tilt-card glass-card rounded-2xl overflow-hidden group flex flex-col justify-between" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
-                <div class="relative overflow-hidden bg-black/20 aspect-square flex items-center justify-center">
-                    <img src="https://images.unsplash.com/photo-1543294001-f7cbfe92237e?auto=format&fit=crop&w=600&q=80" alt="Кольцо Eternity Spark" class="w-full h-full object-cover transition duration-500 group-hover:scale-105 cursor-zoom-in" onclick="openZoom(this.src)">
-                    <span class="absolute top-4 left-4 bg-[#9D4EDD] text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full">В наличии</span>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs text-gray-400 uppercase tracking-widest">Кольца</span>
-                            <h3 class="serif-font text-lg font-semibold mt-1">Eternity Spark Ring</h3>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-lg font-bold block text-[#E0AAFF]">1 200 000 ₸</span>
-                            <span class="text-[10px] text-gray-400 block">Рассрочка от 100 000 ₸/мес</span>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-300 font-light line-clamp-2">Платина, дорожка из 7 идеальных круглых природных бриллиантов, общий вес 1.2 карата.</p>
-                    <button onclick="addToCart('Eternity Spark Ring', 1200000)" class="w-full py-3 bg-white/10 hover:bg-[#9D4EDD] rounded-xl text-xs uppercase tracking-widest font-semibold transition cursor-pointer">
-                        В корзину
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ЭДУКАЦИОННЫЙ БЛОК: ИНФОРМАЦИЯ И ЛАЙФХАКИ -->
-    <section id="education" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="text-center mb-10">
-            <h2 class="serif-font text-2xl sm:text-3xl font-bold tracking-widest">Гид по выбору украшений</h2>
-            <p class="text-xs text-gray-400 mt-2">Всё, что нужно знать о совершенных камнях</p>
-        </div>
-
-        <div class="space-y-4">
-            <!-- Таб 1 -->
-            <div class="glass-card rounded-xl p-6 cursor-pointer" onclick="toggleAccordion('tab1')">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-medium text-sm sm:text-base text-[#E0AAFF]">Природный vs Лабораторный бриллиант: в чем разница?</h3>
-                    <i id="icon-tab1" class="fas fa-chevron-down transition-transform"></i>
-                </div>
-                <div id="content-tab1" class="hidden mt-4 text-xs sm:text-sm text-gray-300 space-y-2 leading-relaxed">
-                    <p><strong>Физически, химически и оптически</strong> — они на 100% идентичны. Лабораторный бриллиант — это не подделка (не фианит и не муассанит), это настоящий алмаз, выращенный в контролируемых условиях, имитирующих земные недра.</p>
-                    <p>🔹 <em>Природный:</em> Формировался миллионы лет. Несет в себе коллекционную и инвестиционную ценность. Стоимость выше.</p>
-                    <p>🔹 <em>Лабораторный:</em> Идеально чистый экологичный камень без дефектов за гораздо более доступный бюджет (разница в цене может достигать 60-70%). Сертифицируется экспертами так же строго (IGI/GIA).</p>
-                </div>
-            </div>
-
-            <!-- Таб 2 -->
-            <div class="glass-card rounded-xl p-6 cursor-pointer" onclick="toggleAccordion('tab2')">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-medium text-sm sm:text-base text-[#E0AAFF]">Лайфхаки: Как выбрать кольцо для помолвки и не ошибиться?</h3>
-                    <i id="icon-tab2" class="fas fa-chevron-down transition-transform"></i>
-                </div>
-                <div id="content-tab2" class="hidden mt-4 text-xs sm:text-sm text-gray-300 space-y-3 leading-relaxed">
-                    <p>1. <strong>Правило 4C:</strong> Обращайте внимание на Carat (Вес), Color (Цвет — лучше D-H), Clarity (Чистота — от IF до VS2) и Cut (Огранка — выбирайте исключительно Excellent).</p>
-                    <p>2. <strong>Как узнать размер незаметно?</strong> Возьмите любое её кольцо (для безымянного или среднего пальца) и обведите внутренний контур на бумаге, либо наденьте на свой палец и отметьте ручкой, до куда оно доходит.</p>
-                    <p>3. <strong>Форма камня решает:</strong> Круглая огранка (Round) сияет ярче всех. Форма «Овал» или «Маркиз» визуально удлиняет пальцы и делает их изящнее.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ОПЛАТА И СРОКИ -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="glass-card rounded-3xl p-8 sm:p-12 bg-gradient-to-br from-[#2A115C]/60 to-[#12072B]/90 border-white/10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div class="space-y-4">
-                <h2 class="serif-font text-2xl sm:text-3xl font-bold tracking-wide">Гибкие условия покупки</h2>
-                <p class="text-sm text-gray-300 leading-relaxed">
-                    Мы ценим ваш комфорт и предлагаем премиальный сервис на каждом этапе. Вы можете приобрести украшения из наличия или заказать изготовление по вашим параметрам.
-                </p>
-                <div class="space-y-2 text-xs uppercase tracking-wider font-semibold text-[#E0AAFF]">
-                    <div class="flex items-center gap-3"><i class="fas fa-credit-card"></i> Оплата любой картой (Visa, MasterCard)</div>
-                    <div class="flex items-center gap-3"><i class="fas fa-percentage"></i> Доступна беспроцентная рассрочка</div>
-                    <div class="flex items-center gap-3"><i class="fas fa-clock"></i> Изготовление на заказ: от 10 до 14 рабочих дней</div>
-                </div>
-            </div>
-            <div class="flex justify-center">
-                <div class="border border-white/10 p-6 rounded-2xl text-center glass-card max-w-sm w-full">
-                    <h3 class="serif-font font-bold text-lg mb-2">Индивидуальный эскиз</h3>
-                    <p class="text-xs text-gray-400 mb-6">Отправьте нам референс желаемого кольца, и мы рассчитаем стоимость в разных вариантах каратности.</p>
-                    <a href="https://wa.me/77019475000" target="_blank" class="block w-full py-3 bg-white text-[#12072B] hover:bg-[#E0AAFF] rounded-xl text-xs uppercase tracking-widest font-bold transition">
-                        Рассчитать стоимость в WhatsApp
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- КОНТАКТЫ & ФУТЕР -->
-    <footer id="contacts" class="border-t border-white/10 mt-20 bg-black/40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-            <div class="space-y-4">
-                <h3 class="serif-font text-xl font-bold tracking-widest text-[#E0AAFF]">GEKKEL JEWELLERY</h3>
-                <p class="text-xs text-gray-400 font-light leading-relaxed">Создаем роскошные ювелирные изделия высшей категории качества. Сопровождаем каждую сделку официальными мировыми сертификатами.</p>
-            </div>
-            <div class="space-y-2">
-                <h4 class="text-xs uppercase tracking-widest font-bold text-white">Связаться с нами</h4>
-                <p class="text-sm text-gray-300 font-medium"><a href="tel:+77019475000" class="hover:text-[#E0AAFF]">+7 (701) 947-50-00</a></p>
-                <p class="text-xs text-gray-400">Консультация, заказ, уточнение статуса наличия (WhatsApp доступен по этому же номеру).</p>
-            </div>
-            <div class="space-y-4 flex flex-col items-center md:items-start">
-                <h4 class="text-xs uppercase tracking-widest font-bold text-white">Мы в соцсетях</h4>
-                <div class="flex space-x-4">
-                    <a href="https://www.instagram.com/gekkel_diamond/" target="_blank" class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:bg-[#9D4EDD] transition text-lg"><i class="fab fa-instagram"></i></a>
-                    <a href="https://wa.me/77019475000" target="_blank" class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:bg-[#25D366] transition text-lg"><i class="fab fa-whatsapp"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="bg-black/20 py-4 text-center text-[10px] text-gray-500 tracking-wider">
-            © 2026 GEKKEL JEWELLERY. Все права защищены.
-        </div>
-    </footer>
-
-    <!-- МОДАЛЬНОЕ ОКНО ДЛЯ ЗУМА ФОТО -->
-    <div id="zoom-modal" class="zoom-overlay" onclick="closeZoom()">
-        <button class="absolute top-6 right-6 text-2xl text-white opacity-70 hover:opacity-100 cursor-pointer"><i class="fas fa-times"></i></button>
-        <img id="zoom-img" src="" alt="Zoomed view" class="zoomed-img" onclick="event.stopPropagation(); toggleMagnify(this)">
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО КОРЗИНЫ -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/70 z-50 hidden justify-end">
-        <div class="w-full max-w-md bg-[#190C34] h-full p-6 flex flex-col justify-between shadow-2xl border-l border-white/10">
-            <div>
-                <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
-                    <h3 class="serif-font text-lg font-bold">Ваша корзина</h3>
-                    <button onclick="toggleCartModal()" class="text-xl opacity-60 hover:opacity-100 cursor-pointer"><i class="fas fa-times"></i></button>
-                </div>
-                <div id="cart-items" class="space-y-4 text-sm text-gray-300">
-                    <!-- Сюда JS добавляет выбранные товары -->
-                    <p class="text-center text-gray-500 py-8">Корзина пока пуста</p>
-                </div>
-            </div>
-            <div class="border-t border-white/10 pt-4 space-y-4">
-                <div class="flex justify-between font-bold text-lg">
-                    <span>Итого:</span>
-                    <span id="cart-total" class="text-[#E0AAFF]">0 ₸</span>
-                </div>
-                <button onclick="checkout()" class="w-full py-4 bg-gradient-to-r from-[#9D4EDD] to-[#7B2CBF] rounded-xl text-xs uppercase tracking-widest font-bold text-center block transition hover:opacity-90">
-                    Оформить (Карта / Рассрочка)
-                </button>
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Название</h2>
+            <p id="modalStatus" style="color: var(--accent); font-weight: bold;"></p>
+            <h3 id="modalPrice">Цена</h3>
+            <p style="margin-top:20px; font-size:14px;">Для добавления в корзину, оформления рассрочки или онлайн-оплаты, пожалуйста, свяжитесь с нами.</p>
+            <div style="margin-top: 20px;">
+                <button onclick="closeModal()" style="padding: 10px 20px; background:var(--primary-lilac); color:white; border:none; border-radius:5px; cursor:pointer;">Закрыть</button>
             </div>
         </div>
     </div>
 
-    <!-- СКРИПТЫ ДЛЯ ИНТЕРАКТИВА -->
     <script>
-        // --- 1. ЭФФЕКТ 3D НАКЛОНА КАРТОЧЕК (TILT EFFECT) ---
-        function handleTilt(e, card) {
-            const cardRect = card.getBoundingClientRect();
-            const cardWidth = cardRect.width;
-            const cardHeight = cardRect.height;
-            
-            // Вычисляем координаты мыши относительно центра карточки
-            const mouseX = e.clientX - cardRect.left - cardWidth / 2;
-            const mouseY = e.clientY - cardRect.top - cardHeight / 2;
-            
-            // Рассчитываем углы поворота (макс 10 градусов)
-            const angleX = -(mouseY / cardHeight / 2) * 15;
-            const angleY = (mouseX / cardWidth / 2) * 15;
-            
-            card.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg) scale3d(1.02, 1.02, 1.02)`;
-            card.style.boxShadow = `0 20px 40px rgba(157, 78, 221, 0.2)`;
+        // Простые функции для работы всплывающего окна при клике на украшение
+        function openModal(title, status, price) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalStatus').innerText = status;
+            document.getElementById('modalPrice').innerText = price;
+            document.getElementById('productModal').style.display = 'flex';
         }
 
-        function resetTilt(card) {
-            card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            card.style.boxShadow = `none`;
-        }
-
-        // --- 2. ИНТЕРАКТИВНЫЙ ЗУМ (ПРИБЛИЖЕНИЕ ФОТО) ---
-        function openZoom(src) {
-            const modal = document.getElementById('zoom-modal');
-            const img = document.getElementById('zoom-img');
-            img.src = src;
-            img.classList.remove('magnified'); // сброс увеличения при открытии нового фото
-            modal.style.display = 'flex';
-        }
-
-        function closeZoom() {
-            document.getElementById('zoom-modal').style.display = 'none';
-        }
-
-        function toggleMagnify(img) {
-            img.classList.toggle('magnified');
-        }
-
-        // --- 3. АККОРДЕОН (ЛАЙФХАКИ И ТАБЫ) ---
-        function toggleAccordion(id) {
-            const content = document.getElementById(`content-${id}`);
-            const icon = document.getElementById(`icon-${id}`);
-            
-            content.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
-        }
-
-        // --- 4. СИМУЛЯЦИЯ КОРЗИНЫ ---
-        let cart = [];
-        
-        function addToCart(name, price) {
-            cart.push({ name, price });
-            updateCartUI();
-            toggleCartModal(); // Открываем корзину, чтобы показать добавленный товар
-        }
-
-        function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.length;
-            const container = document.getElementById('cart-items');
-            const totalContainer = document.getElementById('cart-total');
-            
-            if (cart.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 py-8">Корзина пока пуста</p>';
-                totalContainer.innerText = '0 ₸';
-                return;
-            }
-            
-            let html = '';
-            let total = 0;
-            cart.forEach((item, index) => {
-                total += item.price;
-                html += `
-                    <div class="flex justify-between items-center glass-card p-3 rounded-xl border-white/5">
-                        <div>
-                            <p class="font-medium text-xs sm:text-sm">${item.name}</p>
-                            <p class="text-xs text-[#E0AAFF] mt-0.5">${item.price.toLocaleString()} ₸</p>
-                        </div>
-                        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-500 text-xs px-2 py-1"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-            totalContainer.innerText = total.toLocaleString() + ' ₸';
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-        }
-
-        function toggleCartModal() {
-            const modal = document.getElementById('cart-modal');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        }
-
-        function checkout() {
-            if (cart.length === 0) {
-                alert('Добавьте товары в корзину для оформления заказа');
-                return;
-            }
-            // Перенаправляем на WhatsApp со списком заказанных товаров для обсуждения оплаты картой или в рассрочку
-            let message = 'Здравствуйте! Я хочу оформить заказ в GEKKEL JEWELLERY:\n\n';
-            cart.forEach((item, idx) => {
-                message += `${idx + 1}. ${item.name} — ${item.price.toLocaleString()} ₸\n`;
-            });
-            message += `\nИнтересует вариант оплаты (карта / рассрочка).`;
-            
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/77019475000?text=${encodedMessage}`, '_blank');
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
         }
     </script>
 </body>
