@@ -3,276 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLS - Sound Light Screen | Аренда оборудования[cite: 1]</title>
+    <title>SLS | Sound Light Screen</title>
     <style>
+        /* === БАЗОВЫЕ НАСТРОЙКИ === */
         :root {
-            --primary: #f26522; /* Оранжевый цвет из логотипа */
-            --bg-color: #111111;
-            --text-color: #ffffff;
-            --card-bg: #1e1e1e;
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #141414;
+            --brand-orange: #ff6b00; 
+            --text-light: #f5f5f5;
+            --text-muted: #a0a0a0;
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        body { background-color: var(--primary-bg); color: var(--text-light); line-height: 1.6; overflow-x: hidden; }
+
+        /* === НАВИГАЦИЯ === */
         header {
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('hero-bg.jpg') center/cover;
-            padding: 100px 20px;
-            text-align: center;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; background-color: rgba(10, 10, 10, 0.9);
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            backdrop-filter: blur(10px);
         }
-        h1 {
-            color: var(--primary);
-            font-size: 4em;
-            margin-bottom: 10px;
-            letter-spacing: 5px;
+        .logo { font-size: 28px; font-weight: bold; letter-spacing: 2px; color: var(--brand-orange); }
+        .nav-links a { color: var(--text-light); text-decoration: none; margin-left: 30px; font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--brand-orange); }
+
+        /* === ГЛАВНЫЙ ЭКРАН === */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; padding: 0 20px;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1920&auto=format&fit=crop') center/cover;
         }
-        .subtitle {
-            font-size: 1.2em;
-            max-width: 800px;
-            margin: 0 auto;
-            text-transform: uppercase;
+        .hero h1 { font-size: 4rem; margin-bottom: 20px; text-transform: uppercase; }
+        .hero p { font-size: 1.2rem; max-width: 800px; margin-bottom: 40px; color: var(--text-muted); }
+        
+        .btn {
+            padding: 15px 40px; background-color: var(--brand-orange); color: #fff;
+            text-decoration: none; font-size: 1.1rem; font-weight: bold; border-radius: 5px;
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
         }
-        section {
-            padding: 60px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+        .btn:hover { background-color: #e66000; transform: scale(1.05); box-shadow: 0 10px 20px rgba(255, 107, 0, 0.3); }
+
+        /* === АНИМАЦИИ ПРИ СКРОЛЛЕ (JS) === */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        h2 {
-            text-align: center;
-            color: var(--primary);
-            font-size: 2.5em;
-            margin-bottom: 40px;
-            text-transform: uppercase;
+        .animate-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
+
+        /* === СЕКЦИИ === */
+        .section { padding: 100px 5%; }
+        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 50px; color: var(--brand-orange); }
+
+        /* === ИНТЕРАКТИВНЫЙ СЛАЙДЕР "ДО / ПОСЛЕ" === */
+        .ba-wrapper {
+            max-width: 1000px; margin: 0 auto;
+            position: relative;
         }
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+        .ba-slider {
+            position: relative; width: 100%; height: 600px; overflow: hidden;
+            border-radius: 12px; cursor: ew-resize;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .card {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 10px;
-            border-top: 4px solid var(--primary);
+        /* Изображения для слайдера (заглушки Unsplash для теста) */
+        .ba-image {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; pointer-events: none;
         }
-        .price {
-            font-size: 2em;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 20px 0;
+        /* Картинка БЕЗ света (нижний слой) */
+        .ba-before { background-image: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1920&auto=format&fit=crop'); filter: grayscale(100%) brightness(0.5); }
+        
+        /* Картинка СО светом (верхний слой - обрезается) */
+        .ba-after { 
+            background-image: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1920&auto=format&fit=crop'); 
+            width: 50%; /* Стартовая позиция 50% */
+            border-right: 3px solid var(--brand-orange);
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
         }
-        ul {
-            padding-left: 20px;
+        
+        /* Ползунок */
+        .ba-handle {
+            position: absolute; top: 0; bottom: 0; left: 50%; width: 40px;
+            transform: translateX(-50%); display: flex; justify-content: center; align-items: center;
+            pointer-events: none;
         }
-        ul li {
-            margin-bottom: 10px;
+        .ba-handle-circle {
+            width: 46px; height: 46px; background-color: var(--brand-orange);
+            border-radius: 50%; border: 3px solid #fff;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        .clients {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            opacity: 0.8;
+        /* Стрелочки внутри ползунка */
+        .ba-handle-circle::before, .ba-handle-circle::after {
+            content: ''; border: solid white; border-width: 0 3px 3px 0;
+            display: inline-block; padding: 4px;
         }
-        .clients span {
-            background: #333;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
+        .ba-handle-circle::before { transform: rotate(135deg); margin-right: 4px; }
+        .ba-handle-circle::after { transform: rotate(-45deg); margin-left: 4px; }
+
+        /* Лейблы */
+        .ba-label {
+            position: absolute; top: 20px; padding: 8px 15px; background: rgba(0,0,0,0.6);
+            color: #fff; font-weight: bold; border-radius: 4px; backdrop-filter: blur(5px);
         }
-        .review-card {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 10px;
-            font-style: italic;
+        .ba-label-before { right: 20px; }
+        .ba-label-after { left: 20px; color: var(--brand-orange); }
+
+        /* === ПРЕИМУЩЕСТВА === */
+        .features { background-color: var(--secondary-bg); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .feature-item {
+            background: #1e1e1e; padding: 30px; border-radius: 10px;
+            border-bottom: 4px solid transparent; transition: all 0.3s ease;
         }
-        .review-author {
-            color: var(--primary);
-            font-weight: bold;
-            margin-top: 15px;
-            font-style: normal;
-        }
-        footer {
-            background-color: #000;
-            text-align: center;
-            padding: 40px 20px;
-            border-top: 1px solid #333;
-        }
-        .contact-info {
-            font-size: 1.5em;
-            margin-top: 20px;
-        }
-        .contact-info a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        .conditions {
-            background-color: rgba(242, 101, 34, 0.1);
-            border-left: 4px solid var(--primary);
-            padding: 20px;
-            margin-top: 40px;
-        }
+        .feature-item:hover { border-bottom: 4px solid var(--brand-orange); transform: translateY(-10px); }
+        .feature-item h3 { margin-bottom: 15px; color: var(--text-light); }
+        .feature-item p { color: var(--text-muted); }
+
+        /* === ФУТЕР === */
+        footer { background-color: #000; padding: 50px 5%; text-align: center; border-top: 1px solid #333; }
+        .contact-info { font-size: 1.2rem; margin-bottom: 20px; }
+        .contact-info a { color: var(--brand-orange); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>SLS</h1>
-        <p class="subtitle">Компания по аренде и предоставлению светового и звукового оборудования, LED-экранов, LED-фотозон на мероприятие любого формата и масштаба[cite: 1]</p>
+        <div class="logo">SLS</div>
+        <nav class="nav-links">
+            <a href="#services">До / После</a>
+            <a href="#advantages">Преимущества</a>
+            <a href="#contacts">Контакты</a>
+        </nav>
     </header>
 
-    <section>
-        <h2>Наши преимущества[cite: 1]</h2>
-        <div class="grid-2">
-            <div class="card">
-                <h3>Профессиональная команда</h3>
-                <p>Штат команды из 10-и человек, обученных профессионалов с квалификацией подтвержденной документально. Умение работать в любых условиях.[cite: 1]</p>
-            </div>
-            <div class="card">
-                <h3>Качество и безопасность</h3>
-                <p>Полный набор оборудования под все запросы, имеющие действующие сертификаты качества и соответствует установленным стандартам безопасности.[cite: 1]</p>
+    <section class="hero">
+        <h1 class="animate-on-scroll">SOUND. LIGHT. SCREEN.</h1>
+        <p class="animate-on-scroll" style="transition-delay: 0.2s;">Профессиональная аренда светового и звукового оборудования на мероприятия любого формата и масштаба.</p>
+        <a href="#contacts" class="btn animate-on-scroll" style="transition-delay: 0.4s;">Связаться с нами</a>
+    </section>
+
+    <section id="services" class="section">
+        <h2 class="section-title animate-on-scroll">Почувствуйте разницу</h2>
+        <div class="ba-wrapper animate-on-scroll">
+            <div class="ba-slider" id="baSlider">
+                <div class="ba-image ba-before"></div>
+                <div class="ba-image ba-after" id="baAfter"></div>
+                
+                <div class="ba-handle" id="baHandle">
+                    <div class="ba-handle-circle"></div>
+                </div>
+                
+                <div class="ba-label ba-label-before">Без света</div>
+                <div class="ba-label ba-label-after">С профессиональным светом</div>
             </div>
         </div>
     </section>
 
-    <section style="background-color: #1a1a1a;">
-        <h2>Зачем нужен профессиональный свет[cite: 1]</h2>
-        <div class="grid-2">
-            <div>
-                <h3>Создаёт атмосферу и стиль[cite: 1]</h3>
-                <p>Свет задаёт настроение всего вечера:[cite: 1]</p>
-                <ul>
-                    <li>Тёплый — романтика, уют, нежность[cite: 1]</li>
-                    <li>Холодный — современный стиль, luxury[cite: 1]</li>
-                    <li>Цветной — шоу, танцы, эмоции[cite: 1]</li>
-                </ul>
-                <p>Без света зал выглядит «плоско» и обычным.[cite: 1]</p>
+    <section id="advantages" class="section features">
+        <h2 class="section-title animate-on-scroll">Наш подход</h2>
+        <div class="features-grid">
+            <div class="feature-item animate-on-scroll" style="transition-delay: 0.1s;">
+                <h3>Команда профессионалов</h3>
+                <p>Штат из 10 обученных специалистов с подтвержденной квалификацией.</p>
             </div>
-            <div>
-                <h3>Важное в нашей работе[cite: 1]</h3>
-                <ul>
-                    <li>Полное сопровождение во время мероприятия[cite: 1]</li>
-                    <li>Запасные приборы и кабеля[cite: 1]</li>
-                    <li>Дежурный инженер и Светохудожник[cite: 1]</li>
-                    <li>Опыт работы любого масштаба и формата[cite: 1]</li>
-                    <li>Точный список техники[cite: 1]</li>
-                    <li>Согласование проекта с организаторами по сценарию[cite: 1]</li>
-                </ul>
+            <div class="feature-item animate-on-scroll" style="transition-delay: 0.2s;">
+                <h3>Надежность</h3>
+                <p>Сертифицированное оборудование, запасные приборы и кабеля на площадке.</p>
+            </div>
+            <div class="feature-item animate-on-scroll" style="transition-delay: 0.3s;">
+                <h3>Сопровождение</h3>
+                <p>С вами всегда дежурный инженер и профессиональный светохудожник.</p>
             </div>
         </div>
     </section>
 
-    <section>
-        <h2>Наши услуги[cite: 1]</h2>
-        <div class="grid-4">
-            <div class="card">
-                <h3>Standart[cite: 1]</h3>
-                <div class="price">600.000 ₸[cite: 1]</div>
-                <ul>
-                    <li>ДО 150-И ГОСТЕЙ[cite: 1]</li>
-                    <li>30 ПРИБОРОВ[cite: 1]</li>
-                    <li>АТМОСФЕРНЫЙ ЭФФЕКТ[cite: 1]</li>
-                    <li>БАЗОВЫЕ ИСТОЧНИКИ СВЕТА[cite: 1]</li>
-                    <li>СВЕТОВЫЕ СЦЕНЫ[cite: 1]</li>
-                    <li>СВЕТОХУДОЖНИК[cite: 1]</li>
-                </ul>
-                <p><strong>Результат:</strong> Зал освещён, всё видно, атмосфера есть.[cite: 1]</p>
-                <p><strong>Кому подойдет:</strong> Небольшие бюджеты, камерные события, без шоу-задач.[cite: 1]</p>
-            </div>
-
-            <div class="card">
-                <h3>Premium[cite: 1]</h3>
-                <div class="price">900.000 ₸[cite: 1]</div>
-                <ul>
-                    <li>150-350 ГОСТЕЙ[cite: 1]</li>
-                    <li>50 ПРИБОРОВ[cite: 1]</li>
-                    <li>ЭФФЕКТ "ВАУ-ФОТО"[cite: 1]</li>
-                    <li>РАСШИРЕННЫЙ КОМПЛЕКТ ПРИБОРОВ[cite: 1]</li>
-                    <li>ДИНАМИЧЕСКИЙ СВЕТ ПОД МУЗЫКУ[cite: 1]</li>
-                    <li>АКЦЕНТЫ НА КЛЮЧЕВЫЕ МОМЕНТЫ[cite: 1]</li>
-                </ul>
-                <p><strong>Результат:</strong> Мероприятие выглядит современно и профессионально.[cite: 1]</p>
-                <p><strong>Кому подойдет:</strong> Корпоративы, свадьбы, юбилеи, где важен уровень и визуал.[cite: 1]</p>
-            </div>
-
-            <div class="card">
-                <h3>VIP[cite: 1]</h3>
-                <div class="price">1.600.000 ₸[cite: 1]</div>
-                <ul>
-                    <li>350-500 ГОСТЕЙ[cite: 1]</li>
-                    <li>80 ПРИБОРОВ[cite: 1]</li>
-                    <li>ШОУ ЭФФЕКТ[cite: 1]</li>
-                    <li>ПРЕМИАЛЬНЫЕ СВЕТОВЫЕ ПРИБОРЫ[cite: 1]</li>
-                    <li>ИНДИВИДУАЛЬНЫЙ СЦЕНАРИЙ[cite: 1]</li>
-                    <li>СИНХРОНИЗАЦИЯ СО ЗВУКОМ, DJ[cite: 1]</li>
-                    <li>АКЦЕНТЫ НА КУЛЬМИНАЦИИ[cite: 1]</li>
-                </ul>
-                <p><strong>Результат:</strong> Эффект «как на большом концерте». Гости говорят: «Вот это уровень».[cite: 1]</p>
-                <p><strong>Кому подойдет:</strong> VIP-свадьбы, крупные корпоративы, статусные события.[cite: 1]</p>
-            </div>
-
-            <div class="card">
-                <h3>GOLD[cite: 1]</h3>
-                <div class="price">3.000.000 ₸[cite: 1]</div>
-                <ul>
-                    <li>Полная реализация проекта под ключ[cite: 1]</li>
-                    <li>Гибкие LED-экраны[cite: 1]</li>
-                    <li>Полный комплект приборов[cite: 1]</li>
-                    <li>Премиальный звук[cite: 1]</li>
-                    <li>Pro-свет[cite: 1]</li>
-                    <li>Без экономии на впечатления[cite: 1]</li>
-                    <li>Эксклюзив[cite: 1]</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="conditions">
-            <strong>Условия бронирования:</strong> Бронь на мероприятие идет после внесения предоплаты в размере 20%.[cite: 1] Остаток полной суммы производится за 2 дня до мероприятия.[cite: 1] При неоплате суммы за указанный пакет, рабочие не начинают монтаж работ.[cite: 1]
-        </div>
-    </section>
-
-    <section style="background-color: #1a1a1a;">
-        <h2>Ваши отзывы[cite: 1]</h2>
-        <div class="grid-4">
-            <div class="review-card">
-                «Свет работал идеально под музыку. Выходы, кульминации всё подчёркнуто очень грамотно.»[cite: 1]
-                <div class="review-author">Еламан и Диана (20/08/2026)[cite: 1]</div>
-            </div>
-            <div class="review-card">
-                «Мы даже не ожидали, что свет так сильно влияет на впечатление. Фото и видео получились просто огонь!»[cite: 1]
-                <div class="review-author">Дастан и Аяна (25/06/2025)[cite: 1]</div>
-            </div>
-            <div class="review-card">
-                «Было ощущение уровня большого концерта. Очень красиво и дорого смотрелось.»[cite: 1]
-                <div class="review-author">Амир и Милана (25/07/2022)[cite: 1]</div>
-            </div>
-        </div>
-    </section>
-
-    <section>
-        <h2>Нас выбирают[cite: 1]</h2>
-        <div class="clients">
-            <span>TANK</span><span>Karagandy International Airport</span><span>Wooppay</span><span>EFES KAZAKHSTAN</span><span>QAZ TEHNA</span><span>FOOTBALL CLUB QARAGANDY</span><span>INVICTUS GO</span><span>Halyk</span><span>BMW</span><span>BORUSAN CAT</span><span>HYUNDAI</span>[cite: 1]
-        </div>
-    </section>
-
-    <footer>
-        <h2>Будем рады стать частью вашего мероприятия[cite: 1]</h2>
-        <p>С уважением, команда SLS[cite: 1]</p>
+    <footer id="contacts">
         <div class="contact-info">
-            <p>Телефон: <a href="tel:+77073465220">+7 (707) 346-52-20</a>[cite: 1]</p>
-            <p>Соц.сети: <a href="https://instagram.com/sls_krg" target="_blank">@sls_krg</a>[cite: 1]</p>
+            <p>Телефон: <a href="tel:+77073465220">+7 (707) 346-52-20</a></p>
+            <p>Instagram: <a href="https://instagram.com/sls_krg" target="_blank">@sls_krg</a></p>
         </div>
+        <p style="color: var(--text-muted); margin-top: 20px;">© 2026 SLS. Караганда. Все права защищены.</p>
     </footer>
 
+    <script>
+        // 1. Анимация появления элементов при скролле (Intersection Observer)
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    // Опционально: отменяем наблюдение после того как элемент появился
+                    // scrollObserver.unobserve(entry.target); 
+                }
+            });
+        }, { 
+            threshold: 0.15 // Элемент начнет анимацию, когда на экране появится 15% его высоты
+        });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            scrollObserver.observe(el);
+        });
+
+
+        // 2. Логика ползунка До / После
+        const slider = document.getElementById('baSlider');
+        const afterImage = document.getElementById('baAfter');
+        const handle = document.getElementById('baHandle');
+
+        let isDragging = false;
+
+        // Функция обновления позиции
+        const updateSliderPosition = (e) => {
+            if (!isDragging) return;
+            
+            // Получаем координаты и размеры контейнера
+            const rect = slider.getBoundingClientRect();
+            
+            // Определяем X координату мыши или касания пальцем
+            let x;
+            if (e.type.includes('mouse')) {
+                x = e.clientX - rect.left;
+            } else if (e.type.includes('touch')) {
+                x = e.touches[0].clientX - rect.left;
+            }
+
+            // Высчитываем процент (не даем выйти за пределы 0% - 100%)
+            let percentage = Math.max(0, Math.min((x / rect.width) * 100, 100));
+            
+            // Применяем ширину к маске и позицию к ползунку
+            afterImage.style.width = percentage + '%';
+            handle.style.left = percentage + '%';
+        };
+
+        // Слушатели событий для мыши
+        slider.addEventListener('mousedown', () => isDragging = true);
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('mousemove', updateSliderPosition);
+
+        // Слушатели событий для сенсорных экранов (мобильные телефоны)
+        slider.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            updateSliderPosition(e);
+        });
+        window.addEventListener('touchend', () => isDragging = false);
+        window.addEventListener('touchmove', (e) => {
+            // Предотвращаем скролл страницы при перетягивании ползунка
+            if(isDragging) e.preventDefault(); 
+            updateSliderPosition(e);
+        }, { passive: false });
+
+    </script>
 </body>
 </html>
