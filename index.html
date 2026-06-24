@@ -3,1286 +3,719 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLS — Premium Sound, Light & Screen Production</title>
+    <title>SLS — Premium Light & Sound Production</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@200;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* ==========================================================================
-           1. АРХИТЕКТУРА ПЕРЕМЕННЫХ И ДИЗАЙН-СИСТЕМА (ЦВЕТОВАЯ ПАЛИТРА LUXURY)
-           ========================================================================== */
         :root {
-            /* Базовые Координаты Фонарика по умолчанию */
             --cursor-x: 50vw;
             --cursor-y: 50vh;
-            
-            /* Цветовая палитра Глубокого Темного Пространства */
-            --bg-pure: #0a0a0a;
-            --bg-surface: #111111;
-            --bg-card: #151515;
-            
-            /* Золотые и Световые Акценты */
-            --gold-primary: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.15);
+            --gold-bright: #d4af37;
             --gold-light: #f3e5ab;
-            --gold-dark: #aa8c2c;
-            --text-main: #f5f5f5;
-            --text-muted: #8c8c8c;
+            --text-light: #ffffff;
+            --text-gray: #cccccc;
             
-            /* Исходные параметры для Неоморфных 3D Теней */
-            --shadow-intensity-dark: rgba(0, 0, 0, 0.8);
-            --shadow-intensity-light: rgba(255, 255, 255, 0.03);
-            
-            /* Смещение теней по умолчанию (динамически пересчитывается в JS) */
-            --sh-offset-x-pos: 10px;
-            --sh-offset-y-pos: 10px;
-            --sh-offset-x-neg: -10px;
-            --sh-offset-y-neg: -10px;
-
-            --transition-smooth: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            /* Динамические переменные для объема стеклянных плашек */
+            --glass-shadow-x: 5px;
+            --glass-shadow-y: 5px;
+            --glass-highlight-x: -5px;
+            --glass-highlight-y: -5px;
         }
 
-        /* ==========================================================================
-           2. СБРОС СТИЛЕЙ И ГЛОБАЛЬНЫЕ НАСТРОЙКИ СТРАНИЦЫ
-           ========================================================================== */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             scroll-behavior: smooth;
-            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: var(--bg-pure);
-            color: var(--text-main);
+            background-color: #08080c;
+            color: var(--text-light);
             font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
             overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* Кастомный Скроллбар Премиум-Класса */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-pure);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--gold-dark);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gold-primary);
-        }
-
-        /* Вспомогательные контейнеры */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-
-        section {
-            padding: 140px 0;
-            position: relative;
         }
 
         /* ==========================================================================
-           3. ИНТЕРАКТИВНЫЙ СВЕТОВОЙ ШЛЕЙФ И ОБЪЕМНЫЙ ФОНАРЬ
+           ЖИВОЙ ВИДЕОФОН ДЛЯ ВСЕГО САЙТА
            ========================================================================== */
-        #sls-flashlight-core {
+        .global-video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -2;
+            filter: brightness(0.4) contrast(1.1);
+        }
+
+        .global-video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(8, 8, 12, 0.5), rgba(8, 8, 12, 0.85));
+            z-index: -1;
+        }
+
+        /* Интерактивный луч фонаря поверх видео */
+        #sls-spotlight {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            z-index: 999;
+            z-index: 99;
             background: radial-gradient(
-                circle 450px at var(--cursor-x) var(--cursor-y),
-                rgba(212, 175, 55, 0.06) 0%,
-                rgba(212, 175, 55, 0.02) 40%,
+                circle 380px at var(--cursor-x) var(--cursor-y),
+                rgba(255, 255, 255, 0.04) 0%,
+                rgba(212, 175, 55, 0.02) 50%,
                 transparent 100%
             );
         }
 
-        #sls-laser-pointer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 16px;
-            height: 16px;
-            background: var(--gold-primary);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1000;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 20px 5px var(--gold-primary),
-                        0 0 40px 15px rgba(212, 175, 55, 0.4);
-            transition: width 0.1s, height 0.1s;
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 30px;
         }
 
-        /* ==========================================================================
-           4. НЕОМОРФНЫЙ 3D КОНСТРУКТОР ПЛАШЕК (ВЫПУКЛЫЕ СТРУКТУРЫ)
-           ========================================================================== */
-        .sls-convex-plate {
-            background: var(--bg-surface);
-            border-radius: 24px;
-            padding: 50px;
+        /* Уменьшенные, плотные отступы между секциями */
+        section {
+            padding: 70px 0;
             position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            
-            /* Сложный расчет объемного выталкивания из темной плоскости */
-            box-shadow: 
-                var(--sh-offset-x-pos) var(--sh-offset-y-pos) 30px var(--shadow-intensity-dark),
-                var(--sh-offset-x-neg) var(--sh-offset-y-neg) 30px var(--shadow-intensity-light);
-            
-            transition: var(--transition-smooth);
-        }
-
-        .sls-convex-plate::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.01) 0%, transparent 100%);
-            pointer-events: none;
-        }
-
-        .sls-convex-plate:hover {
-            border-color: rgba(212, 175, 55, 0.15);
         }
 
         /* ==========================================================================
-           5. ТИПОГРАФИКА И ЭЛЕМЕНТЫ ДЕКОРА
+           ОБЪЕМНЫЕ СТЕКЛЯННЫЕ ПЛАШКИ (GLASSMORPHISM 3D)
            ========================================================================== */
-        .section-title-wrapper {
-            margin-bottom: 80px;
-            text-align: center;
+        .sls-glass-plate {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 25px;
+            
+            /* Выпуклый эффект за счет двойного контрастного бордюра */
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            border-left: 1px solid rgba(255, 255, 255, 0.12);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+            border-right: 1px solid rgba(0, 0, 0, 0.6);
+
+            box-shadow: 
+                var(--glass-shadow-x) var(--glass-shadow-y) 25px rgba(0, 0, 0, 0.55),
+                inset 1px 1px 0px rgba(255, 255, 255, 0.05);
+            
+            transition: border 0.4s ease, transform 0.3s ease;
         }
 
-        .section-subtitle {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 6px;
-            color: var(--gold-primary);
-            margin-bottom: 15px;
-            font-weight: 600;
+        .sls-glass-plate:hover {
+            border-top-color: rgba(212, 175, 55, 0.4);
+            border-left-color: rgba(212, 175, 55, 0.4);
+            transform: translateY(-3px);
         }
 
-        .section-main-title {
+        /* Шапка сайта */
+        header.sls-header {
+            padding: 25px 0;
+            background: rgba(8, 8, 12, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
             font-family: 'Cinzel', serif;
-            font-size: 3rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            letter-spacing: 2px;
-            color: #ffffff;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            color: #fff;
+            letter-spacing: 3px;
+            text-decoration: none;
         }
 
-        .gold-gradient-text {
-            background: linear-gradient(90deg, var(--gold-light), var(--gold-primary), var(--gold-dark));
+        .logo span { color: var(--gold-bright); }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-left: 35px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--gold-bright); }
+
+        /* Заголовки */
+        .title-wrapper {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--gold-bright);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .gold-text {
+            background: linear-gradient(90deg, var(--gold-light), var(--gold-bright));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* Навигационная панель */
-        header.sls-premium-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-            padding: 40px 0;
+        /* Главный экран */
+        .hero-layout {
+            padding: 80px 0 50px 0;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        header .header-grid {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand-logo-block {
+        .hero-layout h1 {
             font-family: 'Cinzel', serif;
-            font-size: 2.4rem;
-            font-weight: 700;
-            color: #ffffff;
-            text-decoration: none;
-            letter-spacing: 4px;
-            display: flex;
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero-layout p {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+            margin-bottom: 35px;
+            font-weight: 300;
+        }
+
+        /* Премиум кнопки */
+        .btn-gold {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .brand-logo-block span {
-            color: var(--gold-primary);
-        }
-
-        .header-navigation {
-            display: flex;
-            gap: 40px;
-        }
-
-        .header-navigation a {
-            color: var(--text-muted);
-            text-decoration: none;
+            justify-content: center;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, var(--gold-bright), #bfa02e);
+            color: #000;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: var(--transition-smooth);
-        }
-
-        .header-navigation a:hover {
-            color: var(--gold-primary);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        /* ==========================================================================
-           6. КНОПКИ И ДИНАМИЧЕСКИЕ ССЫЛКИ В СТИЛЕ СВЕТОВОГО ПРИЗЫВА
-           ========================================================================== */
-        .sls-btn-luxury {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 45px;
-            background: linear-gradient(145deg, #181818, #0f0f0f);
-            color: #ffffff;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 3px;
             text-decoration: none;
-            border-radius: 50px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.4),
-                        -5px -5px 15px rgba(255,255,255,0.02);
-            overflow: hidden;
-            transition: var(--transition-smooth);
-            cursor: pointer;
+            border-radius: 40px;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
         }
 
-        .sls-btn-luxury::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: 0.6s;
-        }
-
-        .sls-btn-luxury:hover::before {
-            left: 100%;
-        }
-
-        .sls-btn-luxury:hover {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.25);
+        .btn-gold:hover {
             transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.5);
         }
 
-        .sls-btn-luxury.gold-solid {
-            background: linear-gradient(145deg, var(--gold-primary), var(--gold-dark));
-            color: #000000;
-            border: none;
-            font-weight: 800;
-        }
-
-        .sls-btn-luxury.gold-solid:hover {
-            box-shadow: 0 0 35px rgba(212, 175, 55, 0.4);
-        }
-
-        .social-icon-btn {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: var(--bg-surface);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.01);
-            transition: var(--transition-smooth);
-        }
-
-        .social-icon-btn svg {
-            width: 22px;
-            height: 22px;
-            fill: var(--text-muted);
-            transition: var(--transition-smooth);
-        }
-
-        .social-icon-btn:hover {
-            border-color: var(--gold-primary);
-            transform: scale(1.05);
-        }
-
-        .social-icon-btn.insta-hover:hover svg {
-            fill: #e1306c;
-        }
-
-        .social-icon-btn.wp-hover:hover svg {
-            fill: #25d366;
-        }
-
-        /* ==========================================================================
-           7. ГЛАВНЫЙ ЭКРАН (HERO SECTION) — МАСШТАБ И АТМОСФЕРА
-           ========================================================================== */
-        #hero-cinema-hub {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            padding: 0;
-        }
-
-        .hero-video-underlayer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.25;
-            z-index: 1;
-            filter: contrast(1.1) brightness(0.7);
-        }
-
-        .hero-dark-vignette {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, transparent 30%, var(--bg-pure) 90%),
-                        linear-gradient(to bottom, transparent 70%, var(--bg-pure) 100%);
-            z-index: 2;
-        }
-
-        .hero-content-centerpiece {
-            position: relative;
-            z-index: 3;
-            text-align: center;
-            max-width: 950px;
-        }
-
-        .hero-architectural-tag {
-            font-size: 0.9rem;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            color: var(--gold-primary);
-            margin-bottom: 25px;
-            font-weight: 600;
-            animation: trackingExpand 1.5s ease-out;
-        }
-
-        .hero-epic-title {
-            font-family: 'Cinzel', serif;
-            font-size: 4.5rem;
-            line-height: 1.1;
-            font-weight: 700;
-            margin-bottom: 35px;
-            letter-spacing: 1px;
-        }
-
-        .hero-descriptive-text {
-            font-size: 1.2rem;
-            font-weight: 200;
-            color: var(--text-muted);
-            line-height: 1.8;
-            margin-bottom: 50px;
-            padding: 0 100px;
-        }
-
-        .hero-button-row {
-            display: flex;
-            justify-content: center;
+        /* Сетка преимуществ */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 25px;
         }
 
-        @keyframes trackingExpand {
-            0% { letter-spacing: 2px; opacity: 0; }
-            100% { letter-spacing: 8px; opacity: 1; }
-        }
-
-        /* ==========================================================================
-           8. БЛОК ПРЕИМУЩЕСТВ (ADVANTAGES) — ИНЖЕНЕРНЫЙ ПОДХОД
-           ========================================================================== */
-        .advantages-structural-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
-        }
-
-        .advantage-card-core {
-            display: flex;
-            gap: 30px;
-            align-items: flex-start;
-        }
-
-        .advantage-icon-space {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            background: linear-gradient(145deg, #1c1c1c, #121212);
-            box-shadow: inset 2px 2px 5px rgba(255,255,255,0.05), 4px 4px 15px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .advantage-icon-space svg {
-            width: 35px;
-            height: 35px;
-            fill: var(--gold-primary);
-        }
-
-        .advantage-text-space h3 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 15px;
+        .about-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
             letter-spacing: 1px;
+            color: #fff;
         }
 
-        .advantage-text-space p {
-            color: var(--text-muted);
-            line-height: 1.7;
+        .about-card p {
+            color: var(--text-gray);
             font-size: 0.95rem;
+            line-height: 1.6;
             font-weight: 300;
         }
 
         /* ==========================================================================
-           9. ИНТЕРАКТИВНЫЙ СЛАЙДЕР СРАВНЕНИЯ (BEFORE / AFTER INTERACTIVE)
+           СЕКЦИЯ ПОРТФОЛИО: РОВНО 3 ВИДЕО В РЯД
            ========================================================================== */
-        .sls-split-comparison-deck {
+        .portfolio-triple-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .video-box {
             position: relative;
-            width: 100%;
-            height: 600px;
-            border-radius: 30px;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            user-select: none;
-        }
-
-        .comparison-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-        }
-
-        /* Имитация режима БЕЗ СВЕТА с помощью CSS стилизации */
-        .layer-before {
-            background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1470');
-            filter: brightness(0.2) contrast(0.9) grayscale(0.5);
-        }
-
-        /* Имитация режима СО СВЕTOM — Насыщенная, роскошная картинка */
-        .layer-after {
-            background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1470');
-            filter: brightness(1.1) contrast(1.25) saturate(1.15);
-            width: 50%; /* Будет меняться динамически */
-            border-right: 3px solid var(--gold-primary);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
-        }
-
-        .comparison-caption {
-            position: absolute;
-            bottom: 40px;
-            padding: 15px 30px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 600;
+            height: 480px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .caption-before { left: 40px; color: #777; }
-        .caption-after { right: 40px; color: var(--gold-primary); }
-
-        /* Ползунок управления слайдером */
-        .comparison-scroller-bar {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 4px;
-            height: 100%;
-            background: var(--gold-primary);
-            transform: translateX(-50%);
-            cursor: ew-resize;
-            z-index: 10;
-        }
-
-        .scroller-button-core {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            background: var(--bg-pure);
-            border: 2px solid var(--gold-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-        }
-
-        .scroller-button-core svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--gold-primary);
-        }
-
-        /* ==========================================================================
-           10. ГАЛЕРЕЯ ВИДЕОПРОДАКШЕНА / МЕДИА-ПОРТФОЛИО
-           ========================================================================== */
-        .media-showcase-mosaic {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-
-        .video-card-frame {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            height: 450px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            transition: var(--transition-smooth);
-        }
-
-        .video-card-frame video {
+        .video-box video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.5s ease;
         }
 
-        .video-card-overlay-details {
+        .video-info {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 40px;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+            padding: 30px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 100%);
             z-index: 2;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: var(--transition-smooth);
         }
 
-        .video-card-frame:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 30px 50px rgba(212,175,55,0.15);
-        }
-
-        .video-card-frame:hover video {
-            transform: scale(1.08);
-        }
-
-        .video-card-frame:hover .video-card-overlay-details {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .video-card-overlay-details h4 {
-            font-size: 1.25rem;
+        .video-info h4 {
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
-        .video-card-overlay-details p {
-            color: var(--gold-primary);
-            font-size: 0.85rem;
+        .video-info p {
+            color: var(--gold-bright);
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
 
-        /* ==========================================================================
-           11. СЕТКА ПРЕМИАЛЬНЫХ БРЕНДОВ И ПАРТНЕРОВ (BRAND LOGOS)
-           ========================================================================== */
-        .brand-logos-matrix {
+        .video-box:hover video {
+            transform: scale(1.05);
+        }
+
+        /* Сетка тарифов */
+        .pricing-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
+            gap: 20px;
         }
 
-        .brand-logo-cell {
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            filter: grayscale(1) brightness(0.6);
-            transition: var(--transition-smooth);
-        }
-
-        .brand-logo-cell:hover {
-            filter: grayscale(0) brightness(1);
-            background: rgba(255,255,255,0.01);
-            border-radius: 16px;
-        }
-
-        .brand-logo-cell svg, .brand-logo-cell span {
-            max-width: 80%;
-            max-height: 60%;
-            font-weight: 800;
-            font-size: 1.5rem;
-            letter-spacing: 3px;
-            color: #777;
-        }
-        
-        .brand-logo-cell:hover span {
-            color: #fff;
-        }
-
-        /* ==========================================================================
-           12. ТАРИФНАЯ МАТРИЦА (PRICING MATRIX) — ИНТЕРАКТИВНЫЕ 3D КАРТЫ
-           ========================================================================== */
-        .pricing-structural-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-        }
-
-        .price-card-box {
+        .price-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 650px;
-            padding: 45px 35px;
-            border-radius: 24px;
+            height: 520px;
+            padding: 35px 25px;
+            text-align: center;
         }
 
-        .price-card-box.featured-gold-tier {
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            background: linear-gradient(145deg, #161616, #0e0e0e);
-        }
-
-        .price-tier-header h3 {
+        .price-card h3 {
             font-family: 'Cinzel', serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
         }
 
-        .price-tier-header .tier-scale {
-            font-size: 0.8rem;
-            color: var(--text-muted);
+        .guests-tag {
+            font-size: 0.75rem;
+            color: var(--text-gray);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
             display: block;
         }
 
-        .price-amount-block {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 35px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 25px;
+        .cost {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
-        .price-amount-block span {
-            font-size: 1.2rem;
-            font-weight: 400;
-            color: var(--text-muted);
-        }
-
-        .price-features-list {
+        .features-list {
             list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            text-align: left;
             margin-bottom: auto;
         }
 
-        .price-features-list li {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-            padding-left: 25px;
+        .features-list li {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+            line-height: 1.4;
             position: relative;
+            padding-left: 20px;
         }
 
-        .price-features-list li::before {
-            content: '';
+        .features-list li::before {
+            content: '•';
+            color: var(--gold-bright);
             position: absolute;
             left: 0;
-            top: 6px;
-            width: 8px;
-            height: 8px;
-            background-color: var(--gold-primary);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--gold-primary);
-        }
-
-        .price-card-box .sls-btn-luxury {
-            width: 100%;
-            margin-top: 35px;
-        }
-
-        /* ==========================================================================
-           13. ЭТАПЫ РАБОТЫ И ЮРИДИЧЕСКИЕ/ФИНАНСОВЫЕ УСЛОВИЯ (WORKFLOW & TERMS)
-           ========================================================================== */
-        .workflow-timeline-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-            position: relative;
-        }
-
-        .workflow-timeline-container::before {
-            content: '';
-            position: absolute;
-            top: 80px;
-            left: 50px;
-            width: calc(100% - 100px);
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3) 20%, rgba(212,175,55,0.3) 80%, transparent 100%);
-            z-index: 1;
-        }
-
-        .timeline-step-node {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .node-number-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--bg-surface);
-            border: 2px solid rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--gold-primary);
-            margin: 0 auto 30px auto;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transition: var(--transition-smooth);
+            top: -2px;
         }
 
-        .timeline-step-node:hover .node-number-circle {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 25px rgba(212,175,55,0.4);
-            transform: scale(1.1);
+        .price-card .btn-gold {
+            padding: 12px 25px;
+            font-size: 0.75rem;
+            margin-top: 25px;
+            width: 100%;
         }
 
-        .timeline-step-node h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .timeline-step-node p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        /* ==========================================================================
-           14. ФУТЕР И ПРИЗЫВ К ДЕЙСТВИЮ (FOOTER & CTA BLOCK)
-           ========================================================================== */
-        .cta-closure-card {
-            text-align: center;
-            padding: 80px;
-            background: linear-gradient(145deg, #121212, #090909);
-        }
-
-        .cta-closure-card h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 3rem;
-            margin-bottom: 25px;
-        }
-
-        .cta-closure-card p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 45px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            font-weight: 300;
-        }
-
-        .cta-button-group {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-        }
-
-        footer.sls-grand-footer {
-            padding: 60px 0;
-            border-top: 1px solid rgba(255,255,255,0.03);
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .footer-grid-layout {
+        /* Бренды */
+        .brands-flex {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .footer-copyright span {
-            color: var(--gold-primary);
-            font-weight: 600;
+        .brand-item {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.4);
+            padding: 15px 25px;
         }
 
-        /* ==========================================================================
-           15. РЕПЛИКАЦИЯ АДАПТИВНОСТИ ДЛЯ МОБИЛЬНЫХ СИСТЕМ (MEDIA QUERIES)
-           ========================================================================== */
-        @media (max-width: 1200px) {
-            .pricing-structural-grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
-            .media-showcase-mosaic { grid-template-columns: repeat(2, 1fr); }
-            .hero-epic-title { font-size: 3.5rem; }
+        /* Призыв к действию */
+        .cta-box {
+            text-align: center;
+            padding: 60px;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        @media (max-width: 992px) {
-            .advantages-structural-grid { grid-template-columns: 1fr; }
-            .brand-logos-matrix { grid-template-columns: repeat(2, 1fr); }
-            .workflow-timeline-container { grid-template-columns: repeat(2, 1fr); gap: 50px; }
-            .workflow-timeline-container::before { display: none; }
-            .header-navigation { display: none; }
-            .hero-descriptive-text { padding: 0; }
+        .cta-box h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
         }
 
+        .cta-box p {
+            color: var(--text-gray);
+            margin-bottom: 30px;
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1100px) {
+            .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+            .portfolio-triple-grid { grid-template-columns: 1fr; }
+            .video-box { height: 380px; }
+        }
         @media (max-width: 768px) {
-            .pricing-structural-grid { grid-template-columns: 1fr; }
-            .media-showcase-mosaic { grid-template-columns: 1fr; }
-            .hero-epic-title { font-size: 2.8rem; }
-            .section-main-title { font-size: 2.2rem; }
-            .cta-closure-card { padding: 40px 20px; }
-            .footer-grid-layout { flex-direction: column; gap: 30px; text-align: center; }
+            .about-grid, .pricing-grid { grid-template-columns: 1fr; }
+            .hero-layout h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div id="sls-flashlight-core"></div>
-    <div id="sls-laser-pointer"></div>
+    <!-- Задний живой видеофон (Показывает как работает свет у них) -->
+    <video class="global-video-background" autoplay loop muted playsinline>
+        <!-- Сюда вставь ссылку на фоновое атмосферное видео работы света -->
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-concert-stage-with-laser-lights-and-smoke-41774-large.mp4" type="video/mp4">
+    </video>
+    <div class="global-video-overlay"></div>
 
-    <header class="sls-premium-header">
+    <!-- Эффект луча фонаря -->
+    <div id="sls-spotlight"></div>
+
+    <!-- НАВИГАЦИЯ -->
+    <header class="sls-header">
         <div class="container">
-            <div class="header-grid">
-                <a href="#" class="brand-logo-block">SLS<span>.</span></a>
-                <nav class="header-navigation">
-                    <a href="#about">О компании</a>
-                    <a href="#comparison">Световое Шоу</a>
-                    <a href="#portfolio">Медиа</a>
+            <div class="header-flex">
+                <a href="#" class="logo">SLS<span>.</span></a>
+                <nav class="nav-links">
+                    <a href="#about">Преимущества</a>
+                    <a href="#portfolio">Портфолио</a>
                     <a href="#pricing">Тарифы</a>
-                    <a href="#workflow">Этапы</a>
                 </nav>
-                <div class="header-actions">
-                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D0%BF%D0%B5%D1%85%D0%B5%D1%85%D0%BE%D0%B4%D0%B8%D0%BB%20%D1%81%20%D0%B2%D0%B0%D1%88%D0%B5%D0%B3%D0%BE%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0,%20%D1%85%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D1%8C%20%D1%81%D0%B2%D0%B5%D1%82." class="sls-btn-luxury" target="_blank">Консультация</a>
-                </div>
+                <!-- ИСПРАВЛЕННАЯ ССЫЛКА В ВАТСАП (Без орфографических ошибок) -->
+                <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D0%BF%D0%B5%D1%80%D0%B5%D1%88%D0%B5%D0%BB%20%D1%81%20%D0%B2%D0%B0%D1%88%D0%B5%D0%B3%D0%BE%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0,%20%D1%85%D0%BE%D1%87%D1%83%20%D1%83%D0%B7%D0%BD%D0%B0%D1%82%D1%8C%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B5%D0%B5%20%D0%BE%D0%B1%20%D0%B0%D1%80%D0%B5%D0%BD%D0%B4%D0%B5." class="btn-gold" target="_blank">WhatsApp</a>
             </div>
         </div>
     </header>
 
-    <section id="hero-cinema-hub">
-        <video class="hero-video-underlayer" autoplay loop muted playsinline>
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-concert-stage-with-laser-lights-and-smoke-41774-large.mp4" type="video/mp4">
-        </video>
-        <div class="hero-dark-vignette"></div>
-        
+    <!-- ГЛАВНЫЙ БЛОК -->
+    <section>
         <div class="container">
-            <div class="hero-content-centerpiece">
-                <div class="hero-architectural-tag">Sound · Light · Screen</div>
-                <h1 class="hero-epic-title">Профессиональный свет<br><span class="gold-gradient-text">создает атмосферу</span></h1>
-                <p class="hero-descriptive-text">Мы трансформируем обычные пространства в высокобюджетные визуальные шоу. Превращаем залы в трехмерные глубокие сцены, на которых каждый кадр выглядит кинематографично.</p>
-                <div class="hero-button-row">
-                    <a href="#pricing" class="sls-btn-luxury gold-solid">Изучить тарифы</a>
-                    <a href="#comparison" class="sls-btn-luxury">Смотреть До/После</a>
-                </div>
+            <div class="hero-layout">
+                <div class="subtitle">Premium Production</div>
+                <h1>Профессиональный свет <span class="gold-text">задает стиль</span></h1>
+                <p>Трансформируем любое пространство в высокобюджетное визуальное шоу. Делаем картинку объемной, глубокой и кинематографичной для мероприятий любого масштаба.</p>
+                <a href="#pricing" class="btn-gold">Выбрать решение</a>
             </div>
         </div>
     </section>
 
+    <!-- ПРЕИМУЩЕСТВА -->
     <section id="about">
         <div class="container">
-            <div class="section-title-wrapper">
-                <div class="section-subtitle">Безупречность в деталях</div>
-                <h2 class="section-main-title">Почему выбирают <span class="gold-gradient-text">SLS</span></h2>
+            <div class="title-wrapper">
+                <div class="subtitle">Технический регламент</div>
+                <h2 class="main-title">Безупречность <span class="gold-text">SLS</span></h2>
             </div>
 
-            <div class="advantages-structural-grid">
-                <div class="sls-convex-plate advantage-card-core">
-                    <div class="advantage-icon-space">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </div>
-                    <div class="advantage-text-space">
-                        <h3>Элитный Инженерный Штат</h3>
-                        <p>Команда из 10 сертифицированных профессионалов. На каждом проекте дежурят выделенный светохудожник и технический инженер, гарантируя идеальное ведение сценария.</p>
-                    </div>
+            <div class="about-grid">
+                <div class="sls-glass-plate about-card">
+                    <h3>Команда Экспертов</h3>
+                    <p>В штате 10 сертифицированных профи. На площадке всегда работают персональный светохудожник и дежурный технический инженер.</p>
                 </div>
-                <div class="sls-convex-plate advantage-card-core">
-                    <div class="advantage-icon-space">
-                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-                    </div>
-                    <div class="advantage-text-space">
-                        <h3>Сертифицированный Парк</h3>
-                        <p>Полный спектр высокомощного оборудования со стопроцентным запасом кабельной продукции и резервных приборов прямо на площадке для абсолютной отказоустойчивости.</p>
-                    </div>
+                <div class="sls-glass-plate about-card">
+                    <h3>Отказоустойчивость 100%</h3>
+                    <p>Все приборы имеют сертификаты безопасности. Наличие резервных кабельных систем и запасного оборудования прямо на объекте.</p>
                 </div>
-                <div class="sls-convex-plate advantage-card-core">
-                    <div class="advantage-icon-space">
-                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                    </div>
-                    <div class="advantage-text-space">
-                        <h3>Безопасность Стандартов</h3>
-                        <p>Вся техника обладает действующими международными сертификатами качества. Установленные конструкции проходят жесткий предварительный стресс-тест.</p>
-                    </div>
+                <div class="sls-glass-plate about-card">
+                    <h3>Работа по сценарию</h3>
+                    <p>Световая партитура строго синхронизируется с таймингом организаторов, движениями артистов и звуковой динамикой.</p>
                 </div>
-                <div class="sls-convex-plate advantage-card-core">
-                    <div class="advantage-icon-space">
-                        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                    </div>
-                    <div class="advantage-text-space">
-                        <h3>Режиссура по Сценарию</h3>
-                        <p>Мы не просто включаем свет — мы пишем под ваше событие партитуру световых переходов, синхронизированную с таймингом артистов и звуковой динамикой.</p>
-                    </div>
+                <div class="sls-glass-plate about-card">
+                    <h3>Прозрачный расчет</h3>
+                    <p>Фиксация даты по 20% предоплате. Полный финальный расчет производится за 2 дня до начала монтажных работ.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="comparison">
-        <div class="container">
-            <div class="section-title-wrapper">
-                <div class="section-subtitle">Оцените разницу вживую</div>
-                <h2 class="section-main-title">Сила правильного <span class="gold-gradient-text">освещения</span></h2>
-            </div>
-
-            <div class="sls-split-comparison-deck">
-                <div class="comparison-layer layer-before">
-                    <div class="comparison-caption caption-before">Без профессионального света (Плоская картинка)</div>
-                </div>
-                <div class="comparison-layer layer-after">
-                    <div class="comparison-caption caption-after">Со светом SLS (Премиальный объем и шоу)</div>
-                </div>
-                <div class="comparison-scroller-bar">
-                    <div class="scroller-button-core">
-                        <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4h11V9H10z"/></svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    <!-- ==========================================
+         СЕКЦИЯ ПОРТФОЛИО: 3 ТВОИХ ВИДЕО В РЯД
+         ========================================== -->
     <section id="portfolio">
         <div class="container">
-            <div class="section-title-wrapper">
-                <div class="section-subtitle">Наши Живые Хроники</div>
-                <h2 class="section-main-title">События в объективе <span class="gold-gradient-text">кино-камер</span></h2>
+            <div class="title-wrapper">
+                <div class="subtitle">Шоу в действии</div>
+                <h2 class="main-title">Живые <span class="gold-text">кадры</span></h2>
             </div>
 
-            <div class="media-showcase-mosaic">
-                <div class="video-card-frame">
+            <div class="portfolio-triple-grid">
+                <!-- Твое Видео 1 -->
+                <div class="video-box">
                     <video autoplay loop muted playsinline>
+                        <!-- Замени ссылку в src на свое первое видео -->
                         <source src="https://assets.mixkit.co/videos/preview/mixkit-filming-a-concert-with-a-smartphone-41775-large.mp4" type="video/mp4">
                     </video>
-                    <div class="video-card-overlay-details">
-                        <h4>Автомобильный запуск</h4>
-                        <p>Пакет VIP / Световая геометрия</p>
+                    <div class="video-info">
+                        <h4>Презентация авто</h4>
+                        <p>Геометрия лучей</p>
                     </div>
                 </div>
-                <div class="video-card-frame">
+
+                <!-- Твое Видео 2 -->
+                <div class="video-box">
                     <video autoplay loop muted playsinline>
+                        <!-- Замени ссылку в src на свое второе видео -->
                         <source src="https://assets.mixkit.co/videos/preview/mixkit-crowd-at-a-rock-concert-41772-large.mp4" type="video/mp4">
                     </video>
-                    <div class="video-card-overlay-details">
-                        <h4>Масштабный Фестиваль</h4>
-                        <p>Пакет Gold / Концертные Массивы</p>
+                    <div class="video-info">
+                        <h4>Масштабный фестиваль</h4>
+                        <p>Концертные массивы</p>
                     </div>
                 </div>
-                <div class="video-card-frame">
+
+                <!-- Твое Видео 3 -->
+                <div class="video-box">
                     <video autoplay loop muted playsinline>
+                        <!-- Замени ссылку в src на свое третье видео -->
                         <source src="https://assets.mixkit.co/videos/preview/mixkit-lights-flashing-at-a-live-concert-41767-large.mp4" type="video/mp4">
                     </video>
-                    <div class="video-card-overlay-details">
-                        <h4>Luxury Гала-Вечер</h4>
-                        <p>Пакет Premium / Интерьерная заливка</p>
+                    <div class="video-info">
+                        <h4>Гала-ужин Luxury</h4>
+                        <p>Интерьерная заливка</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="brands">
+    <!-- БРЕНДЫ -->
+    <section>
         <div class="container">
-            <div class="section-title-wrapper">
-                <div class="section-subtitle">Доверие лидеров рынка</div>
-                <h2 class="section-main-title">С кем мы <span class="gold-gradient-text">создаем историю</span></h2>
-            </div>
-
-            <div class="brand-logos-matrix">
-                <div class="sls-convex-plate brand-logo-cell"><span>BMW</span></div>
-                <div class="sls-convex-plate brand-logo-cell"><span>TANK</span></div>
-                <div class="sls-convex-plate brand-logo-cell"><span>HYUNDAI</span></div>
-                <div class="sls-convex-plate brand-logo-cell"><span>HALYK</span></div>
-                <div class="sls-convex-plate brand-logo-cell"><span>WOOPPAY</span></div>
-                <div class="sls-convex-plate brand-logo-cell"><span>BORUSAN CAT</span></div>
-                <div class="sls-convex-plate brand-logo-cell"><span>EFES</span></div>
-                <div class="sls-convex-plate brand-logo-cell"><span>KAA AIRPORT</span></div>
+            <div class="sls-glass-plate brands-flex">
+                <div class="brand-item">BMW</div>
+                <div class="brand-item">TANK</div>
+                <div class="brand-item">HYUNDAI</div>
+                <div class="brand-item">HALYK</div>
+                <div class="brand-item">WOOPPAY</div>
+                <div class="brand-item">BORUSAN CAT</div>
             </div>
         </div>
     </section>
 
+    <!-- ТАРИФЫ -->
     <section id="pricing">
         <div class="container">
-            <div class="section-title-wrapper">
-                <div class="section-subtitle">Прозрачное Ценообразование</div>
-                <h2 class="section-main-title">Пакеты световых <span class="gold-gradient-text">решений</span></h2>
+            <div class="title-wrapper">
+                <div class="subtitle">Стоимость решений</div>
+                <h2 class="main-title">Пакеты <span class="gold-text">аренды</span></h2>
             </div>
 
-            <div class="pricing-structural-grid">
-                <div class="sls-convex-plate price-card-box">
-                    <div class="price-tier-header">
+            <div class="pricing-grid">
+                <!-- Standart -->
+                <div class="sls-glass-plate price-card">
+                    <div>
                         <h3>Standart</h3>
-                        <span class="tier-scale">До 150 гостей</span>
-                        <div class="price-amount-block">600 000 <span>₸</span></div>
+                        <span class="guests-tag">До 150 гостей</span>
+                        <div class="cost">600 000 ₸</div>
                     </div>
-                    <ul class="price-features-list">
-                        <li>30 профессиональных приборов</li>
-                        <li>Базовая световая архитектура</li>
-                        <li>Генерация легких атмосферных эффектов</li>
-                        <li>Работа квалифицированного светохудожника</li>
+                    <ul class="features-list">
+                        <li>30 приборов</li>
+                        <li>Базовый свет</li>
+                        <li>Атмосферный эффект</li>
+                        <li>Светохудожник</li>
                     </ul>
-                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20Standart." class="sls-btn-luxury" target="_blank">Забронировать</a>
+                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20Standart." class="btn-gold" target="_blank">Выбрать</a>
                 </div>
 
-                <div class="sls-convex-plate price-card-box">
-                    <div class="price-tier-header">
+                <!-- Premium -->
+                <div class="sls-glass-plate price-card">
+                    <div>
                         <h3>Premium</h3>
-                        <span class="tier-scale">150 – 350 гостей</span>
-                        <div class="price-amount-block">900 000 <span>₸</span></div>
+                        <span class="guests-tag">150 - 350 гостей</span>
+                        <div class="cost">900 000 ₸</div>
                     </div>
-                    <ul class="price-features-list">
-                        <li>50 высококлассных приборов</li>
-                        <li>Проектирование направленных лучей (Beams)</li>
-                        <li>Динамическая синхронизация под бит</li>
-                        <li>Создание условий для идеальных «вау-фотографий»</li>
+                    <ul class="features-list">
+                        <li>50 приборов + лучи</li>
+                        <li>Динамика под музыку</li>
+                        <li>Акценты на моменты</li>
+                        <li>Идеально для фото</li>
                     </ul>
-                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20Premium." class="sls-btn-luxury" target="_blank">Забронировать</a>
+                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20Premium." class="btn-gold" target="_blank">Выбрать</a>
                 </div>
 
-                <div class="sls-convex-plate price-card-box featured-gold-tier">
-                    <div class="price-tier-header">
-                        <h3 style="color: var(--gold-primary);">VIP</h3>
-                        <span class="tier-scale">350 – 500 гостей</span>
-                        <div class="price-amount-block">1 600 000 <span>₸</span></div>
+                <!-- VIP -->
+                <div class="sls-glass-plate price-card">
+                    <div>
+                        <h3>VIP</h3>
+                        <span class="guests-tag">350 - 500 гостей</span>
+                        <div class="cost">1 600 000 ₸</div>
                     </div>
-                    <ul class="price-features-list">
-                        <li>80 приборов экстра-высокой мощности</li>
-                        <li>Разработка персонального светового сценария</li>
-                        <li>Полная интеграция со звуковыми контроллерами</li>
-                        <li>Отдельный выделенный оператор пульта</li>
+                    <ul class="features-list">
+                        <li>80 мощных приборов</li>
+                        <li>Свой сценарий шоу</li>
+                        <li>Синхронизация звука</li>
+                        <li>Выделенный оператор</li>
                     </ul>
-                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20VIP." class="sls-btn-luxury gold-solid" target="_blank">Забронировать</a>
+                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20VIP." class="btn-gold" target="_blank">Выбрать</a>
                 </div>
 
-                <div class="sls-convex-plate price-card-box">
-                    <div class="price-tier-header">
-                        <h3>Gold</h3>
-                        <span class="tier-scale">Премиум масштабы</span>
-                        <div class="price-amount-block">3 000 000 <span>₸</span></div>
+                <!-- GOLD -->
+                <div class="sls-glass-plate price-card">
+                    <div>
+                        <h3>GOLD</h3>
+                        <span class="guests-tag">Индивидуально</span>
+                        <div class="cost">3 000 000 ₸</div>
                     </div>
-                    <ul class="price-features-list">
-                        <li>Индивидуальное неограниченное число приборов</li>
-                        <li>Реализация под ключ без компромиссов</li>
-                        <li>Включение ультрасовременных гибких LED-экранов</li>
-                        <li>Премиальный массив звука в комплекте</li>
+                    <ul class="features-list">
+                        <li>Реализация под ключ</li>
+                        <li>Максимум эффектов</li>
+                        <li>Гибкие LED-экраны</li>
+                        <li>Премиальный звук</li>
                     </ul>
-                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20GOLD." class="sls-btn-luxury" target="_blank">Связаться</a>
+                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20GOLD." class="btn-gold" target="_blank">Выбрать</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="workflow">
+    <!-- ПРИЗЫВ К ДЕЙСТВИЮ -->
+    <section>
         <div class="container">
-            <div class="section-title-wrapper">
-                <div class="section-subtitle">Регламент Продакшена</div>
-                <h2 class="section-main-title">Этапы нашего <span class="gold-gradient-text">сотрудничества</span></h2>
-            </div>
-
-            <div class="workflow-timeline-container">
-                <div class="timeline-step-node">
-                    <div class="node-number-circle">01</div>
-                    <h4>Бронирование и Фиксация</h4>
-                    <p>Внесение 20% предоплаты для железного резервирования даты и комплекта оборудования за вашим проектом.</p>
-                </div>
-                <div class="timeline-step-node">
-                    <div class="node-number-circle">02</div>
-                    <h4>Разработка Режиссуры</h4>
-                    <p>Детальное согласование со сценарием организаторов, проектирование партитуры и световых акцентов.</p>
-                </div>
-                <div class="timeline-step-node">
-                    <div class="node-number-circle">03</div>
-                    <h4>Полный Взаиморасчет</h4>
-                    <p>Финальный расчет производится строго за 2 дня до официального старта монтажных работ на площадке.</p>
-                </div>
-                <div class="timeline-step-node">
-                    <div class="node-number-circle">04</div>
-                    <h4>Монтаж и Шоу</h4>
-                    <p>Заезд команды, инсталляция, проведение технических тестов и безупречное проведение шоу-программы.</p>
+            <div class="sls-glass-plate cta-box">
+                <h2>Создайте безупречное <span class="gold-text">шоу</span></h2>
+                <p>Забронируйте комплект профессионального освещения SLS прямо сейчас. Напишите нам в WhatsApp или подпишитесь на наш Instagram, чтобы увидеть больше бэкстейджей.</p>
+                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D0%BF%D0%B5%D1%80%D0%B5%D1%88%D0%B5%D0%BB%20%D1%81%20%D0%B2%D0%B0%D1%88%D0%B5%D0%B3%D0%BE%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0,%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BE%D0%B1%D1%81%D1%83%D0%B4%D0%B8%D1%82%D1%8C%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82." class="btn-gold" target="_blank">Обсудить проект в WhatsApp</a>
+                    <a href="https://www.instagram.com/sls_krg" class="btn-gold" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);" target="_blank">Instagram</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="cta">
+    <!-- ФУТЕР -->
+    <footer>
         <div class="container">
-            <div class="sls-convex-plate cta-closure-card">
-                <h2>Готовы создать нечто <span class="gold-gradient-text">легендарное?</span></h2>
-                <p>Не оставляйте атмосферу главного события на волю случая. Забронируйте премиальный световой комплекс от SLS и обеспечьте безупречный уровень вашего мероприятия.</p>
-                <div class="cta-button-group">
-                    <a href="https://wa.me/77073465220?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D0%BF%D0%B5%D1%85%D0%B5%D1%85%D0%BE%D0%B4%D0%B8%D0%BB%20%D1%81%20%D0%B2%D0%B0%D1%88%D0%B5%D0%B3%D0%BE%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0,%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BE%D0%B1%D1%81%D1%83%D0%B4%D0%B8%D1%82%D1%8C%20%D0%B0%D1%80%D0%B5%D0%BD%D0%B4%D1%82%D1%83%20%D1%81%D0%B2%D0%B5%D1%82%D0%B0." class="sls-btn-luxury gold-solid" target="_blank">Обсудить проект в WhatsApp</a>
-                    <a href="https://www.instagram.com/sls_krg" class="social-icon-btn insta-hover" target="_blank" title="Instagram">
-                        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="sls-grand-footer">
-        <div class="container">
-            <div class="footer-grid-layout">
-                <div class="footer-copyright">
-                    © 2026 <span>SLS Production</span>. Все права защищены. Разработка премиум систем.
-                </div>
-                <div class="footer-contacts-summary">
-                    Караганда · +7 (707) 346-52-20 · @sls_krg
-                </div>
-            </div>
+            <p>© 2026 SLS Production. Караганда. Все права защищены. Техническое обеспечение атмосферных событий.</p>
         </div>
     </footer>
 
+    <!-- СЦЕНАРИЙ ИНТЕРАКТИВНОГО СВЕТА -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const flashlightCore = document.getElementById('sls-flashlight-core');
-            const laserPointer = document.getElementById('sls-laser-pointer');
-            const plates = document.querySelectorAll('.sls-convex-plate');
+            const spotlight = document.getElementById('sls-spotlight');
+            const glassPlates = document.querySelectorAll('.sls-glass-plate');
             
-            let mouseX = window.innerWidth / 2;
-            let mouseY = window.innerHeight / 2;
-            let currentX = mouseX;
-            let currentY = mouseY;
+            let mX = window.innerWidth / 2;
+            let mY = window.innerHeight / 2;
+            let curX = mX;
+            let curY = mY;
 
-            // Сглаживание движения фонаря (Интерполяция)
             document.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
+                mX = e.clientX;
+                mY = e.clientY;
             });
 
-            function updateFlashlightEngine() {
-                // Использование линейной интерполяции (LERP) для мягкого кинематографичного шлейфа
-                currentX += (mouseX - currentX) * 0.15;
-                currentY += (mouseY - currentY) * 0.15;
+            function renderEngine() {
+                // Плавное следование луча фонаря за мышкой
+                curX += (mX - curX) * 0.12;
+                curY += (mY - curY) * 0.12;
 
-                document.documentElement.style.setProperty('--cursor-x', `${currentX}px`);
-                document.documentElement.style.setProperty('--cursor-y', `${currentY}px`);
+                document.documentElement.style.setProperty('--cursor-x', `${curX}px`);
+                document.documentElement.style.setProperty('--cursor-y', `${curY}px`);
 
-                laserPointer.style.left = `${mouseX}px`;
-                laserPointer.style.top = `${mouseY}px`;
-
-                // ВЫЧИСЛЕНИЕ НАПРАВЛЕНИЯ ТЕНЕЙ ДЛЯ СИМУЛЯЦИИ НАСТОЯЩЕГО 3D ОБЪЕМА
-                plates.forEach(plate => {
+                // 3D Перерасчет теней для эффекта выпуклого преломления на стекле
+                glassPlates.forEach(plate => {
                     const rect = plate.getBoundingClientRect();
-                    const plateCenterX = rect.left + rect.width / 2;
-                    const plateCenterY = rect.top + rect.height / 2;
+                    const pCenterX = rect.left + rect.width / 2;
+                    const pCenterY = rect.top + rect.height / 2;
 
-                    // Вектор от источника света (курсора) к центру плашки
-                    const distanceX = plateCenterX - currentX;
-                    const distanceY = plateCenterY - currentY;
+                    const diffX = pCenterX - curX;
+                    const diffY = pCenterY - curY;
 
-                    // Нормализация и расчет сдвига тени (смещение идет в противоположную от света сторону)
-                    const maxOffset = 14; 
-                    const length = Math.sqrt(distanceX * distanceX + distanceY * distanceY) || 1;
-                    
-                    const shiftX = Math.min(Math.max((distanceX / length) * maxOffset, -maxOffset), maxOffset);
-                    const shiftY = Math.min(Math.max((distanceY / length) * maxOffset, -maxOffset), maxOffset);
+                    const len = Math.sqrt(diffX * diffX + diffY * diffY) || 1;
+                    const maxDist = 8; 
 
-                    // Переназначение локальных переменных смещения тени для конкретной карты
-                    plate.style.setProperty('--sh-offset-x-pos', `${shiftX}px`);
-                    plate.style.setProperty('--sh-offset-y-pos', `${shiftY}px`);
-                    plate.style.setProperty('--sh-offset-x-neg', `${-shiftX}px`);
-                    plate.style.setProperty('--sh-offset-y-neg', `${-shiftY}px`);
+                    const sX = Math.min(Math.max((diffX / len) * maxDist, -maxDist), maxDist);
+                    const sY = Math.min(Math.max((diffY / len) * maxDist, -maxDist), maxDist);
+
+                    plate.style.setProperty('--glass-shadow-x', `${sX}px`);
+                    plate.style.setProperty('--glass-shadow-y', `${sY}px`);
                 });
 
-                requestAnimationFrame(updateFlashlightEngine);
+                requestAnimationFrame(renderEngine);
             }
-            requestAnimationFrame(updateFlashlightEngine);
-
-            // ИНТЕРАКТИВНЫЙ СЛАЙДЕР СРАВНЕНИЯ "ДО/ПОСЛЕ"
-            const comparisonDeck = document.querySelector('.sls-split-comparison-deck');
-            const layerAfter = document.querySelector('.layer-after');
-            const scrollerBar = document.querySelector('.comparison-scroller-bar');
-
-            let isSliding = false;
-
-            function processSlide(clientX) {
-                const rect = comparisonDeck.getBoundingClientRect();
-                const x = clientX - rect.left;
-                let percentage = (x / rect.width) * 100;
-                
-                if (percentage < 0) percentage = 0;
-                if (percentage > 100) percentage = 100;
-
-                layerAfter.style.width = `${percentage}%`;
-                scrollerBar.style.left = `${percentage}%`;
-            }
-
-            scrollerBar.addEventListener('mousedown', () => isSliding = true);
-            window.addEventListener('mouseup', () => isSliding = false);
-            
-            window.addEventListener('mousemove', (e) => {
-                if (!isSliding) return;
-                processSlide(e.clientX);
-            });
-
-            // Поддержка сенсорных экранов для слайдера
-            scrollerBar.addEventListener('touchstart', () => isSliding = true);
-            window.addEventListener('touchend', () => isSliding = false);
-            window.addEventListener('touchmove', (e) => {
-                if (!isSliding) return;
-                processSlide(e.touches[0].clientX);
-            });
-
-            console.log("SLS Engine Core: Световая архитектура успешно инициализирована.");
+            requestAnimationFrame(renderEngine);
         });
     </script>
 </body>
