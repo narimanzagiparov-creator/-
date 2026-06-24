@@ -3,395 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEKKEL JEWELLERY | Бриллианты и украшения</title>
+    <title>SLS - Sound Light Screen | Аренда оборудования[cite: 1]</title>
     <style>
         :root {
-            --primary-color: #0A192F; /* Глубокий синий/черный для контраста */
-            --accent-color: #D4AF37; /* Элегантное золото */
-            --bg-color: #F8F9FA; /* Яркий, чистый фон */
-            --text-color: #333333;
+            --primary: #f26522; /* Оранжевый цвет из логотипа */
+            --bg-color: #111111;
+            --text-color: #ffffff;
+            --card-bg: #1e1e1e;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-        }
-
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
         }
-
-        /* Header & Navigation */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 50px;
-            background: rgba(255, 255, 255, 0.95);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('hero-bg.jpg') center/cover;
+            padding: 100px 20px;
+            text-align: center;
         }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-color);
-            letter-spacing: 2px;
+        h1 {
+            color: var(--primary);
+            font-size: 4em;
+            margin-bottom: 10px;
+            letter-spacing: 5px;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            max-width: 800px;
+            margin: 0 auto;
             text-transform: uppercase;
         }
-
-        .nav-links a {
-            margin-left: 20px;
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            transition: color 0.3s ease;
+        section {
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-
-        .nav-links a:hover {
-            color: var(--accent-color);
-        }
-
-        /* Hero Section with 3D Effect */
-        .hero {
-            height: 80vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        h2 {
             text-align: center;
-            perspective: 1000px;
-            background: linear-gradient(135deg, #ffffff 0%, #e6e9f0 100%);
-            padding: 20px;
-        }
-
-        .hero-content {
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            transform: translateZ(50px);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            margin-bottom: 10px;
-            transform: translateZ(30px);
-            letter-spacing: 1px;
-        }
-
-        /* Features */
-        .features {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            padding: 40px 20px;
-            background-color: var(--primary-color);
-            color: white;
-            flex-wrap: wrap;
-        }
-
-        .feature-item {
-            text-align: center;
-            font-size: 1rem;
-            letter-spacing: 1px;
-        }
-
-        /* Catalog & Filters */
-        .catalog-section {
-            padding: 60px 50px;
-        }
-
-        .filters {
-            display: flex;
-            gap: 15px;
+            color: var(--primary);
+            font-size: 2.5em;
             margin-bottom: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
+            text-transform: uppercase;
         }
-
-        select {
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            outline: none;
-            cursor: pointer;
-            background: white;
-        }
-
-        .catalog-grid {
+        .grid-2 {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 40px;
         }
-
-        /* Product Card */
-        .product-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-        }
-
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-        }
-
-        /* Zoom Effect */
-        .img-container {
-            width: 100%;
-            height: 250px;
-            overflow: hidden;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .img-container:hover img {
-            transform: scale(1.3); /* Функция приближения */
-        }
-
-        .product-info h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-
-        .product-price {
-            font-size: 1.4rem;
-            color: var(--accent-color);
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .product-status {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: var(--primary-color);
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .btn:hover {
-            background: var(--accent-color);
-        }
-
-        /* Education Section */
-        .education {
-            padding: 60px 50px;
-            background: #fff;
-        }
-
-        .education h2 {
-            text-align: center;
-            margin-bottom: 40px;
-            color: var(--primary-color);
-        }
-
-        .edu-grid {
+        .grid-4 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
-
-        .edu-card {
-            padding: 20px;
-            border: 1px solid #eee;
+        .card {
+            background-color: var(--card-bg);
+            padding: 30px;
             border-radius: 10px;
-            background: var(--bg-color);
+            border-top: 4px solid var(--primary);
         }
-
-        /* Footer */
+        .price {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 10px;
+        }
+        .clients {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            opacity: 0.8;
+        }
+        .clients span {
+            background: #333;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .review-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            font-style: italic;
+        }
+        .review-author {
+            color: var(--primary);
+            font-weight: bold;
+            margin-top: 15px;
+            font-style: normal;
+        }
         footer {
-            background: var(--primary-color);
-            color: white;
-            padding: 40px 50px;
+            background-color: #000;
             text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid #333;
         }
-
-        footer a {
-            color: var(--accent-color);
+        .contact-info {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .contact-info a {
+            color: var(--primary);
             text-decoration: none;
-            margin: 0 10px;
+        }
+        .conditions {
+            background-color: rgba(242, 101, 34, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">GEKKEL JEWELLERY</div>
-        <div class="nav-links">
-            <a href="#catalog">Каталог</a>
-            <a href="#education">Гид покупателя</a>
-            <a href="https://wa.me/77019475000" target="_blank">WhatsApp</a>
-            <a href="#" onclick="alert('Корзина пока пуста')">🛒 Корзина</a>
-        </div>
+        <h1>SLS</h1>
+        <p class="subtitle">Компания по аренде и предоставлению светового и звукового оборудования, LED-экранов, LED-фотозон на мероприятие любого формата и масштаба[cite: 1]</p>
     </header>
 
-    <section class="hero" id="hero">
-        <div class="hero-content" id="hero-content">
-            <p>▪️ Бриллианты природные и лабораторные ▪️</p>
-            <h1>Истинное сияние</h1>
-            <p>Топ характеристики | Сертификаты GIA и IGI | На заказ</p>
+    <section>
+        <h2>Наши преимущества[cite: 1]</h2>
+        <div class="grid-2">
+            <div class="card">
+                <h3>Профессиональная команда</h3>
+                <p>Штат команды из 10-и человек, обученных профессионалов с квалификацией подтвержденной документально. Умение работать в любых условиях.[cite: 1]</p>
+            </div>
+            <div class="card">
+                <h3>Качество и безопасность</h3>
+                <p>Полный набор оборудования под все запросы, имеющие действующие сертификаты качества и соответствует установленным стандартам безопасности.[cite: 1]</p>
+            </div>
         </div>
     </section>
 
-    <section class="features">
-        <div class="feature-item">💎 Безупречная огранка</div>
-        <div class="feature-item">💳 Оплата картой и в рассрочку</div>
-        <div class="feature-item">🌍 Доставка по всему миру</div>
-    </section>
-
-    <section class="catalog-section" id="catalog">
-        <div class="filters">
-            <select id="filter-type">
-                <option value="all">Все изделия</option>
-                <option value="ring">Кольца</option>
-                <option value="pendant">Подвески</option>
-            </select>
-            <select id="filter-stone">
-                <option value="all">Тип камня</option>
-                <option value="natural">Природный</option>
-                <option value="lab">Лабораторный</option>
-            </select>
-            <select id="filter-price">
-                <option value="all">Любая цена</option>
-                <option value="low">До 500,000 ₸</option>
-                <option value="high">От 500,000 ₸</option>
-            </select>
-        </div>
-
-        <div class="catalog-grid" id="catalog-grid">
-            <!-- Товары будут генерироваться через JavaScript -->
+    <section style="background-color: #1a1a1a;">
+        <h2>Зачем нужен профессиональный свет[cite: 1]</h2>
+        <div class="grid-2">
+            <div>
+                <h3>Создаёт атмосферу и стиль[cite: 1]</h3>
+                <p>Свет задаёт настроение всего вечера:[cite: 1]</p>
+                <ul>
+                    <li>Тёплый — романтика, уют, нежность[cite: 1]</li>
+                    <li>Холодный — современный стиль, luxury[cite: 1]</li>
+                    <li>Цветной — шоу, танцы, эмоции[cite: 1]</li>
+                </ul>
+                <p>Без света зал выглядит «плоско» и обычным.[cite: 1]</p>
+            </div>
+            <div>
+                <h3>Важное в нашей работе[cite: 1]</h3>
+                <ul>
+                    <li>Полное сопровождение во время мероприятия[cite: 1]</li>
+                    <li>Запасные приборы и кабеля[cite: 1]</li>
+                    <li>Дежурный инженер и Светохудожник[cite: 1]</li>
+                    <li>Опыт работы любого масштаба и формата[cite: 1]</li>
+                    <li>Точный список техники[cite: 1]</li>
+                    <li>Согласование проекта с организаторами по сценарию[cite: 1]</li>
+                </ul>
+            </div>
         </div>
     </section>
 
-    <section class="education" id="education">
-        <h2>Гид по выбору идеального украшения</h2>
-        <div class="edu-grid">
-            <div class="edu-card">
-                <h3>Природный vs Лабораторный</h3>
-                <p>Лабораторные бриллианты имеют те же физические и химические свойства, что и природные. Разница лишь в происхождении: одни созданы природой за миллионы лет, другие — выращены в лаборатории с идеальными характеристиками.</p>
+    <section>
+        <h2>Наши услуги[cite: 1]</h2>
+        <div class="grid-4">
+            <div class="card">
+                <h3>Standart[cite: 1]</h3>
+                <div class="price">600.000 ₸[cite: 1]</div>
+                <ul>
+                    <li>ДО 150-И ГОСТЕЙ[cite: 1]</li>
+                    <li>30 ПРИБОРОВ[cite: 1]</li>
+                    <li>АТМОСФЕРНЫЙ ЭФФЕКТ[cite: 1]</li>
+                    <li>БАЗОВЫЕ ИСТОЧНИКИ СВЕТА[cite: 1]</li>
+                    <li>СВЕТОВЫЕ СЦЕНЫ[cite: 1]</li>
+                    <li>СВЕТОХУДОЖНИК[cite: 1]</li>
+                </ul>
+                <p><strong>Результат:</strong> Зал освещён, всё видно, атмосфера есть.[cite: 1]</p>
+                <p><strong>Кому подойдет:</strong> Небольшие бюджеты, камерные события, без шоу-задач.[cite: 1]</p>
             </div>
-            <div class="edu-card">
-                <h3>Лайфхак: Как узнать размер кольца?</h3>
-                <p>Оберните нитку вокруг пальца, измерьте её длину в миллиметрах и разделите на 3.14. Полученное число — это и есть размер кольца (например, 16.5 или 17).</p>
+
+            <div class="card">
+                <h3>Premium[cite: 1]</h3>
+                <div class="price">900.000 ₸[cite: 1]</div>
+                <ul>
+                    <li>150-350 ГОСТЕЙ[cite: 1]</li>
+                    <li>50 ПРИБОРОВ[cite: 1]</li>
+                    <li>ЭФФЕКТ "ВАУ-ФОТО"[cite: 1]</li>
+                    <li>РАСШИРЕННЫЙ КОМПЛЕКТ ПРИБОРОВ[cite: 1]</li>
+                    <li>ДИНАМИЧЕСКИЙ СВЕТ ПОД МУЗЫКУ[cite: 1]</li>
+                    <li>АКЦЕНТЫ НА КЛЮЧЕВЫЕ МОМЕНТЫ[cite: 1]</li>
+                </ul>
+                <p><strong>Результат:</strong> Мероприятие выглядит современно и профессионально.[cite: 1]</p>
+                <p><strong>Кому подойдет:</strong> Корпоративы, свадьбы, юбилеи, где важен уровень и визуал.[cite: 1]</p>
             </div>
-            <div class="edu-card">
-                <h3>Что такое сертификат GIA / IGI?</h3>
-                <p>Это независимый паспорт камня, подтверждающий его подлинность и характеристики (вес, цвет, чистота, огранка).</p>
+
+            <div class="card">
+                <h3>VIP[cite: 1]</h3>
+                <div class="price">1.600.000 ₸[cite: 1]</div>
+                <ul>
+                    <li>350-500 ГОСТЕЙ[cite: 1]</li>
+                    <li>80 ПРИБОРОВ[cite: 1]</li>
+                    <li>ШОУ ЭФФЕКТ[cite: 1]</li>
+                    <li>ПРЕМИАЛЬНЫЕ СВЕТОВЫЕ ПРИБОРЫ[cite: 1]</li>
+                    <li>ИНДИВИДУАЛЬНЫЙ СЦЕНАРИЙ[cite: 1]</li>
+                    <li>СИНХРОНИЗАЦИЯ СО ЗВУКОМ, DJ[cite: 1]</li>
+                    <li>АКЦЕНТЫ НА КУЛЬМИНАЦИИ[cite: 1]</li>
+                </ul>
+                <p><strong>Результат:</strong> Эффект «как на большом концерте». Гости говорят: «Вот это уровень».[cite: 1]</p>
+                <p><strong>Кому подойдет:</strong> VIP-свадьбы, крупные корпоративы, статусные события.[cite: 1]</p>
             </div>
+
+            <div class="card">
+                <h3>GOLD[cite: 1]</h3>
+                <div class="price">3.000.000 ₸[cite: 1]</div>
+                <ul>
+                    <li>Полная реализация проекта под ключ[cite: 1]</li>
+                    <li>Гибкие LED-экраны[cite: 1]</li>
+                    <li>Полный комплект приборов[cite: 1]</li>
+                    <li>Премиальный звук[cite: 1]</li>
+                    <li>Pro-свет[cite: 1]</li>
+                    <li>Без экономии на впечатления[cite: 1]</li>
+                    <li>Эксклюзив[cite: 1]</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="conditions">
+            <strong>Условия бронирования:</strong> Бронь на мероприятие идет после внесения предоплаты в размере 20%.[cite: 1] Остаток полной суммы производится за 2 дня до мероприятия.[cite: 1] При неоплате суммы за указанный пакет, рабочие не начинают монтаж работ.[cite: 1]
+        </div>
+    </section>
+
+    <section style="background-color: #1a1a1a;">
+        <h2>Ваши отзывы[cite: 1]</h2>
+        <div class="grid-4">
+            <div class="review-card">
+                «Свет работал идеально под музыку. Выходы, кульминации всё подчёркнуто очень грамотно.»[cite: 1]
+                <div class="review-author">Еламан и Диана (20/08/2026)[cite: 1]</div>
+            </div>
+            <div class="review-card">
+                «Мы даже не ожидали, что свет так сильно влияет на впечатление. Фото и видео получились просто огонь!»[cite: 1]
+                <div class="review-author">Дастан и Аяна (25/06/2025)[cite: 1]</div>
+            </div>
+            <div class="review-card">
+                «Было ощущение уровня большого концерта. Очень красиво и дорого смотрелось.»[cite: 1]
+                <div class="review-author">Амир и Милана (25/07/2022)[cite: 1]</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Нас выбирают[cite: 1]</h2>
+        <div class="clients">
+            <span>TANK</span><span>Karagandy International Airport</span><span>Wooppay</span><span>EFES KAZAKHSTAN</span><span>QAZ TEHNA</span><span>FOOTBALL CLUB QARAGANDY</span><span>INVICTUS GO</span><span>Halyk</span><span>BMW</span><span>BORUSAN CAT</span><span>HYUNDAI</span>[cite: 1]
         </div>
     </section>
 
     <footer>
-        <h2>GEKKEL JEWELLERY</h2>
-        <p style="margin: 20px 0;">Свяжитесь с нами для консультации или индивидуального заказа</p>
-        <p>📞 Телефон / WhatsApp: <a href="https://wa.me/77019475000">+7 701 947 5000</a></p>
-        <p>📸 Instagram: <a href="https://www.instagram.com/gekkel_diamond/" target="_blank">@gekkel_diamond</a></p>
+        <h2>Будем рады стать частью вашего мероприятия[cite: 1]</h2>
+        <p>С уважением, команда SLS[cite: 1]</p>
+        <div class="contact-info">
+            <p>Телефон: <a href="tel:+77073465220">+7 (707) 346-52-20</a>[cite: 1]</p>
+            <p>Соц.сети: <a href="https://instagram.com/sls_krg" target="_blank">@sls_krg</a>[cite: 1]</p>
+        </div>
     </footer>
 
-    <script>
-        // 3D эффект движения в Hero секции
-        const hero = document.getElementById('hero');
-        const heroContent = document.getElementById('hero-content');
-
-        hero.addEventListener('mousemove', (e) => {
-            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-            heroContent.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-        });
-
-        hero.addEventListener('mouseleave', () => {
-            heroContent.style.transform = `rotateY(0deg) rotateX(0deg)`;
-        });
-
-        // База данных товаров (здесь можно добавить до 50 штук)
-        const products = [
-            { id: 1, name: "Кольцо Solitaire (Природный)", type: "ring", stone: "natural", price: 850000, carat: "1.0 ct", status: "В наличии", image: "https://images.unsplash.com/photo-1605100804763-247f66126e28?auto=format&fit=crop&w=600&q=80" },
-            { id: 2, name: "Подвеска Halo (Лаб.)", type: "pendant", stone: "lab", price: 320000, carat: "0.8 ct", status: "На заказ (ждать 10-14 дней)", image: "https://images.unsplash.com/photo-1599643478524-fb66f70a00f0?auto=format&fit=crop&w=600&q=80" },
-            { id: 3, name: "Кольцо Eternity (Лаб.)", type: "ring", stone: "lab", price: 450000, carat: "2.0 ct", status: "В наличии", image: "https://images.unsplash.com/photo-1603561596112-0a132b757442?auto=format&fit=crop&w=600&q=80" },
-            { id: 4, name: "Кольцо Three-Stone (Природный)", type: "ring", stone: "natural", price: 1200000, carat: "1.5 ct", status: "На заказ (ждать 20 дней)", image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=600&q=80" },
-        ];
-
-        const catalogGrid = document.getElementById('catalog-grid');
-
-        // Функция отрисовки каталога
-        function renderCatalog(items) {
-            catalogGrid.innerHTML = '';
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <div class="img-container">
-                        <img src="${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="product-info">
-                        <h3>${item.name}</h3>
-                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 5px;">Каратность: ${item.carat}</p>
-                        <p class="product-status"><b>Статус:</b> ${item.status}</p>
-                        <p class="product-price">${item.price.toLocaleString('ru-RU')} ₸</p>
-                        <button class="btn" onclick="alert('Товар добавлен в корзину. Доступна рассрочка и оплата картой.')">В корзину</button>
-                    </div>
-                `;
-                catalogGrid.appendChild(card);
-            });
-        }
-
-        // Первичная отрисовка
-        renderCatalog(products);
-
-        // Логика фильтров
-        document.querySelectorAll('select').forEach(select => {
-            select.addEventListener('change', () => {
-                const type = document.getElementById('filter-type').value;
-                const stone = document.getElementById('filter-stone').value;
-                const price = document.getElementById('filter-price').value;
-
-                const filtered = products.filter(item => {
-                    const matchType = type === 'all' || item.type === type;
-                    const matchStone = stone === 'all' || item.stone === stone;
-                    let matchPrice = true;
-                    if (price === 'low') matchPrice = item.price <= 500000;
-                    if (price === 'high') matchPrice = item.price > 500000;
-                    
-                    return matchType && matchStone && matchPrice;
-                });
-
-                renderCatalog(filtered);
-            });
-        });
-    </script>
 </body>
 </html>
